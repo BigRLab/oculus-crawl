@@ -14,7 +14,7 @@ class WebCore(object):
 
     def __init__(self):
         self.virtual_browser_display = Display(visible=False, size=(800, 600))
-        self.virtual_browser = Firefox(desired_capabilities={'acceptSslCerts': 'True'})
+        self.virtual_browser = Firefox()
         self.virtual_browser.set_window_position(-1000, -1000)
 
     def get(self, url):
