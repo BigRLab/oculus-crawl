@@ -11,8 +11,9 @@ import logging
 __author__ = "Ivan de Paz Centeno"
 
 
-# Number of elements that the service is going to keep at least in the queue, at all the time.
+# Number of elements that the service is going to keep at least in the queue, all the time.
 QUEUE_MIN_BUFFER = 50
+
 
 class CrawlerService(Service, SocketInterface, RequestPool):
 
