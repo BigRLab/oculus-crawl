@@ -44,9 +44,9 @@ class GoogleImages(object):
 
         self.transport_core.get(url)
 
-        logging.info("Get done. Loading elements JSON")
-
         self._cache_all_page()
+
+        logging.info("Get done. Loading elements JSON")
 
         json_elements = [json.loads(element) for element in self.transport_core.get_elements_html_by_class("rg_meta")]
 

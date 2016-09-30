@@ -6,6 +6,10 @@ import logging
 from pyvirtualdisplay import Display
 from selenium.webdriver import Firefox
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 from time import sleep
 
 
@@ -76,3 +80,7 @@ class WebCore(object):
     def click_button_by_class(self, param):
         button = self.virtual_browser.find_element_by_class_name(param)
         button.click()
+
+    def wait_for_elements_from_class(self, class_name):
+        sleep(0.5)
+        WebDriverWait(self.virtual_browser, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, class_name)))

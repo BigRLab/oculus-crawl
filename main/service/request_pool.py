@@ -81,7 +81,7 @@ class RequestPool(object):
         while self.processes_free > 0 and not self.stop_processing:
             try:
                 logging.info(
-                    "Processing queue with {} free processes and {} set to stop processing.".format(self.processes_free,
+                    "Processing queue with {} free processes (stop flag is {}).".format(self.processes_free,
                                                                                                     self.stop_processing))
 
                 self.processes_free -= 1
