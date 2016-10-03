@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from main.search_engine.search_engines import SEARCH_ENGINES
 from main.transport_core.webcore import WebCore
 import urllib
 import json
@@ -51,8 +52,8 @@ class GoogleImages(object):
         json_elements = [json.loads(element) for element in self.transport_core.get_elements_html_by_class("rg_meta")]
 
         logging.info("Retrieved {} elements".format(len(json_elements)))
-        return [{'url': image['ou'], 'width': image['ow'], 'height': image['oh'], 'desc': image['pt']} for image
-                in json_elements]
+        return [{'url': image['ou'], 'width': image['ow'], 'height': image['oh'], 'desc': image['pt'],
+                 'source':'google'} for image in json_elements]
 
     def _cache_all_page(self):
         """
@@ -69,3 +70,6 @@ class GoogleImages(object):
             self.transport_core.scroll_to_bottom()
             elements = self.transport_core.get_elements_html_by_class("rg_meta")
             current_percent = len(elements)
+
+# Register the class to enable deserialization.
+SEARCH_ENGINES[str(GoogleImages)] = GoogleImages

@@ -57,7 +57,7 @@ class SocketInterface(object):
                 identity = socket.recv().decode()
                 formatted_request = socket.recv_json()
 
-                if not ('uri' in formatted_request):
+                if not ('action' in formatted_request):
 
                     socket.send_string(identity, zmq.SNDMORE)
                     socket.send_json({'error':'Invalid request'})

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from PIL import ImageFile
 
+from main.search_engine.search_engines import SEARCH_ENGINES
 from main.transport_core.webcore import WebCore
 import urllib
 import urllib.request
@@ -82,7 +83,7 @@ class FlickrImages(object):
             tag_description = [tag["title"] for tag in tags]
 
             image_json['desc'] = "{};{}".format(date_taken, ";".join(tag_description))
-
+            image_json['source'] = "flickr"
         # ELSE: We skip this iteration because it is spam
 
         return image_json
@@ -135,3 +136,5 @@ class FlickrImages(object):
 
         return prepend_text + url
 
+# Register the class to enable deserialization.
+SEARCH_ENGINES[str(FlickrImages)] = FlickrImages

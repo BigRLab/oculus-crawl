@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import html
 
+from main.search_engine.search_engines import SEARCH_ENGINES
 from main.transport_core.webcore import WebCore
 import urllib
 import urllib.parse as urlparse
@@ -121,16 +122,19 @@ class YahooImages(object):
             json_data = json.loads(html.unescape(data))
             result = {'url': self._prepend_http_protocol(json_data['iurl']), 'width': json_data['w'],
                       'height': json_data['h'],
-                      'desc': json_data['alt']}
+                      'desc': json_data['alt'],
+                      'source': 'yahoo'}
         else:
             link = element.find("a")
             if link:
                 href = link["href"]
                 parsed_href = urlparse.parse_qs(urlparse.urlparse(href).query)
                 result = {'url': self._prepend_http_protocol(parsed_href['imgurl'][0]), 'width': parsed_href['w'][0],
-                          'height': parsed_href['h'][0], 'desc': parsed_href['name'][0]}
+                          'height': parsed_href['h'][0], 'desc': parsed_href['name'][0], 'source': 'yahoo'}
             else:
                 result = {}
 
         return result
 
+# Register the class to enable deserialization.
+SEARCH_ENGINES[str(YahooImages)] = YahooImages

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import re
+from main.search_engine.search_engines import SEARCH_ENGINES
 
 from main.transport_core.webcore import WebCore
 import json
@@ -119,8 +120,11 @@ class BingImages(object):
         result = {'url': self._prepend_http_protocol(json_data['imgurl']),
                   'width': width,
                   'height': height,
-                  'desc': description}
+                  'desc': description,
+                  'source': 'bing'}
         logging.info("Result: {}".format(result))
 
         return result
 
+# Register the class to enable deserialization.
+SEARCH_ENGINES[str(BingImages)] = BingImages

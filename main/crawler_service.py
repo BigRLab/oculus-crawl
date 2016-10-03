@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from main.service.request_pool import RequestPool
-from main.service.service import Service
-from main.service.socket_interface import SocketInterface
+from main.service.service import Service, SERVICE_STOPPED
 from time import sleep
 
 import logging
@@ -12,34 +11,37 @@ __author__ = "Ivan de Paz Centeno"
 
 
 # Number of elements that the service is going to keep at least in the queue, all the time.
-QUEUE_MIN_BUFFER = 50
+QUEUE_MIN_BUFFER = 2
 
 
-class CrawlerService(Service, SocketInterface, RequestPool):
+class CrawlerService(Service, RequestPool):
 
-    def __init__(self, search_session, time_secs_between_requests=0.5, processes=1,
-                 host="127.0.0.1", port=8370):
-        logging.info("Initializing Crawler Service on host {}:{} for {} processes and {} secs between requests.".format(
-            host, port, processes, time_secs_between_requests
+    def __init__(self, search_session, time_secs_between_requests=0.5, processes=1):
+        logging.info("Initializing Crawler Service for {} processes and {} secs between requests.".format(
+            processes, time_secs_between_requests
         ))
 
         Service.__init__(self)
-        SocketInterface.__init__(self, host=host, port=port)
         RequestPool.__init__(self, processes, time_secs_between_requests)
 
         self.time_secs_between_requests = time_secs_between_requests
         self.processes = processes
         self.search_session = search_session
+        self.on_process_finished = None
 
         assert self.search_session
         logging.info("Crawler Service initialized. Listening and waiting for requests.")
+
+    def register_on_process_finished(self, func):
+        self.on_process_finished = func
 
     def process_finished(self, wrapped_result):
         search_request = wrapped_result[0]
         crawl_result = wrapped_result[1]
 
+        search_request.associate_result(crawl_result)
         # Log to session
-        self.search_session.add_entry(search_request)
+        self.search_session.add_history_entry(search_request)
 
         logging.info("[{}%] Results for request {} retrieved: {}.".format(
             self.search_session.get_completion_progress(), search_request, len(crawl_result)
@@ -47,6 +49,9 @@ class CrawlerService(Service, SocketInterface, RequestPool):
 
         if self.search_session.get_completion_progress() == 100:
             logging.info("Crawler finished.")
+
+        if self.on_process_finished:
+            self.on_process_finished(search_request, crawl_result)
 
     def start(self):
         logging.info("Crawler started digesting requests.")
@@ -66,6 +71,7 @@ class CrawlerService(Service, SocketInterface, RequestPool):
 
     def __internal_thread__(self):
         Service.__internal_thread__(self)
+        do_sleep = 0
 
         while not self.__get_stop_flag__():
 
@@ -76,7 +82,13 @@ class CrawlerService(Service, SocketInterface, RequestPool):
                     if search_request:
                         self.queue_request(search_request)
                     else:
-                        sleep(0.1)
+                        do_sleep = 0.1
 
                 else:
-                    sleep(0.1)
+                    do_sleep = 0.1
+
+            if do_sleep:
+                sleep(do_sleep)
+                do_sleep = 0
+
+        self.__set_status__(SERVICE_STOPPED)

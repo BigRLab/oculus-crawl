@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from main.transport_core.transport_cores import TRANSPORT_CORES
 
 __author__ = "Ivan de Paz Centeno"
 import logging
@@ -84,3 +85,6 @@ class WebCore(object):
     def wait_for_elements_from_class(self, class_name):
         sleep(0.5)
         WebDriverWait(self.virtual_browser, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, class_name)))
+
+# Register the class to enable deserialization.
+TRANSPORT_CORES[str(WebCore)] = WebCore
