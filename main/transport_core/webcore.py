@@ -18,7 +18,7 @@ class WebCore(object):
     Represents the transport core for the surface web.
     """
 
-    def __init__(self, gui=False):
+    def __init__(self, gui=False, window_size=(1300, 4000)):
         self.gui = gui
         profile = webdriver.FirefoxProfile()
         profile.set_preference("browser.cache.disk.enable", False)
@@ -31,7 +31,7 @@ class WebCore(object):
             self.virtual_browser_display.start()
 
         self.virtual_browser = Firefox(profile)
-        self.virtual_browser.set_window_size(900, 4000)
+        self.virtual_browser.set_window_size(*window_size)
 
         #self.virtual_browser.set_window_position(-1000, -1000)
 

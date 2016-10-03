@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from main.crawler_service import CrawlerService
 from main.search_engine.bing_images import BingImages
+from main.search_engine.flickr_images import FlickrImages
 from main.search_engine.google_images import GoogleImages
 from main.search_engine.yahoo_images import YahooImages
 from main.search_session.search_request import SearchRequest
@@ -30,7 +31,7 @@ search_session = SearchSession()
 
 #search_request = SearchRequest("asd", {'face'}, search_engine_proto=GoogleImages)
 
-search_request = SearchRequest("1 year old girl", {'face'}, search_engine_proto=BingImages)
+search_request = SearchRequest("1 year old girl", {'face'}, search_engine_proto=FlickrImages)
 
 search_session.append_search_requests([search_request])
 

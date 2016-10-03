@@ -127,8 +127,8 @@ class YahooImages(object):
             if link:
                 href = link["href"]
                 parsed_href = urlparse.parse_qs(urlparse.urlparse(href).query)
-                result = {'url': self._prepend_http_protocol(parsed_href['imgurl'][0]), 'w': parsed_href['w'][0],
-                          'h': parsed_href['h'][0], 'desc': parsed_href['name'][0]}
+                result = {'url': self._prepend_http_protocol(parsed_href['imgurl'][0]), 'width': parsed_href['w'][0],
+                          'height': parsed_href['h'][0], 'desc': parsed_href['name'][0]}
             else:
                 result = {}
 
