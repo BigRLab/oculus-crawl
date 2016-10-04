@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import json
+import logging
+
 from main.search_session.search_request import SearchRequest
 from main.service.service_client import ServiceClient
 
@@ -104,5 +107,71 @@ class RemoteSearchSession(ServiceClient):
             result = response['result']
         else:
             result = False
+
+        return result
+
+    def save_session(self, filename, dump_in_progress_as_pending=True):
+        """
+        Saves the current session in a file in JSON format.
+        :param dump_in_progress_as_pending:
+        :param filename: URI to the file.
+        :return: True if could be saved. False otherwise.
+        """
+        self.__send_request__({
+            'action': 'get_session_data',
+            'dump_in_progress_as_pending': dump_in_progress_as_pending
+        })
+
+        serial = self.__get_response__()
+        if 'result' in serial:
+            serial = serial['result']
+
+        logging.info(serial)
+        try:
+            assert ('search_requests' in serial)
+            assert ('search_history' in serial)
+
+            with open(filename, 'w') as outfile:
+                json.dump(serial, outfile)
+
+            result = True
+            logging.info("Session file saved in {}".format(filename))
+        except:
+            result = False
+            logging.info("Could not save the file because of remote malformed response")
+
+        return result
+
+    def load_session(self, filename, load_in_progress_as_pending=True):
+        """
+        Loads the current session from a file.
+        :param load_in_progress_as_pending:
+        :param filename: URI to the file.
+        :return: True if could be loaded. False otherwise.
+        """
+        try:
+            with open(filename, 'r') as infile:
+                data = json.load(infile)
+
+            self.__send_request__({
+                'action': 'set_session_data',
+                'data': data,
+                'load_in_progress_as_pending': load_in_progress_as_pending
+            })
+
+            response = self.__get_response__()
+
+            if 'result' in response:
+                result = response['result']
+            else:
+                result = False
+
+        except:
+            result = False
+
+        if result:
+            logging.info("Session loaded from file {}".format(filename))
+        else:
+            logging.info("Session couldn't be loaded!")
 
         return result

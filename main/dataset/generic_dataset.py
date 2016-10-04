@@ -18,4 +18,6 @@ class GenericDataset(Dataset):
 
         Dataset.__init__(self, root_folder, metadata_file, "Generic dataset")
 
-        self.search_session =
+        self.search_session = search_session
+
+    def get_data

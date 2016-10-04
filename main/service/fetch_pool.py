@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from urllib.request import urlopen, Request
 from multiprocessing import Manager
 from multiprocessing.pool import Pool
 from queue import Empty
@@ -8,7 +9,6 @@ import logging
 
 __author__ = "Ivan de Paz Centeno"
 
-search_engine = None
 wait_seconds_between_requests = 0
 
 
@@ -19,31 +19,35 @@ def process(queue_element):
     :param queue_element: element extracted from the queue.
     :return: search engine request result.
     """
-    global search_engine, wait_seconds_between_requests
+    global wait_seconds_between_requests
 
-    sleep(wait_seconds_between_requests)
+    print("wait seconds: {}".format(wait_seconds_between_requests))
+    if wait_seconds_between_requests > 0:
+        sleep(wait_seconds_between_requests)
 
     # We fetch the search variables from the queue element
-    search_request = queue_element[0]
-    logging.info("Processing request {}.".format(search_request))
+    download_url = queue_element[0]
+    logging.info("Processing url {}.".format(download_url))
 
-    search_engine_proto = search_request.get_search_engine_proto()
+    try:
+        req = Request(download_url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36'})
+        data = urlopen(req).read()
+        logging.info("Downloaded url {}".format(download_url))
+    except Exception as e:
+        data = None
+        logging.info("Failed to download {}; reason: {}".format(download_url, str(e)))
 
-    # This way we cache the search_engine between requests in the same thread.
-    if not search_engine or search_engine.__class__ != search_engine_proto:
-        search_engine = search_engine_proto()
-
-    return [queue_element[0], search_engine.retrieve(search_request)]
+    return [download_url, data]
 
 
-class RequestPool(object):
+class FetchPool(object):
     """
-    Pool processes for search engine requests.
-    Allows to process requests by using a defined search engine, in parallel
+    Pool processes for downloading images.
+    Allows concurrently download of images
     """
 
-    def __init__(self, pool_limit=1, time_secs_between_requests=None):
-
+    def __init__(self, pool_limit=10, time_secs_between_requests=None):
+        # 10 concurrent downloads is a good ammount
         self.manager = Manager()
         self.processing_queue = self.manager.Queue()
 
@@ -53,24 +57,28 @@ class RequestPool(object):
         self.stop_processing = False
 
     @staticmethod
-    def _init_pool_worker(time_secs_between_requests):
+    def _init_pool_worker(time_secs_between_requests=0):
         """
-        Initializes the worker thread. Each worker of the pool has its own firefox and display instance.
+        Initializes the worker thread.
         :param self:
         :return:
         """
         global wait_seconds_between_requests
 
+        if not time_secs_between_requests:
+            time_secs_between_requests = 0
+
         wait_seconds_between_requests = time_secs_between_requests
 
-    def queue_request(self, search_request):
+    def queue_download(self, url):
         """
-        put a search request in the search request queue.
-        :param search_request: search request instance
+        put a download request in the download queue.
+        :param url: download url
         :return:
         """
-        logging.info("Queued request {}.".format(search_request))
-        self.processing_queue.put([search_request])
+        logging.info("Queued url to download {}.".format(url))
+        self.processing_queue.put([url])
+        self.process_queue()
 
     def process_queue(self):
         """
@@ -86,7 +94,6 @@ class RequestPool(object):
                                                                                         self.stop_processing))
                 self.processes_free -= 1
                 result = self.pool.apply_async(process, args=(queue_element,), callback=self._process_finished)
-
 
             except Empty:
                 logging.info("No elements queued.")
