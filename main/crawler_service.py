@@ -82,10 +82,10 @@ class CrawlerService(Service, RequestPool):
                     if search_request:
                         self.queue_request(search_request)
                     else:
-                        do_sleep = 0.1
+                        do_sleep = 0.5
 
                 else:
-                    do_sleep = 0.1
+                    do_sleep = 0.3
 
             if do_sleep:
                 sleep(do_sleep)

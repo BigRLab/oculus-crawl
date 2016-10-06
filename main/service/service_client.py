@@ -4,6 +4,7 @@ import logging
 import os
 
 import zmq
+from multiprocessing import Lock
 
 __author__ = 'Iván de Paz Centeno'
 
@@ -13,41 +14,40 @@ class ServiceClient(object):
         self.host = host
         self.port = port
         self.context = zmq.Context()
-        self.is_connected = False
+        self._connect()
+        self.lock = Lock()
 
-    def __connect__(self):
+    def _connect(self):
         self.worker = self.context.socket(zmq.DEALER)
         self.worker.setsockopt_string(zmq.IDENTITY, str(os.getpid()))
         self.worker.connect("tcp://{}:{}".format(self.host, self.port))
-        self.is_connected = True
 
-    def __disconnect__(self):
+    def _disconnect(self):
         self.worker.close()
-        self.is_connected = False
 
-    def __send_request__(self, formatted_request):
-        try:
-            if not self.is_connected:
-                self.__connect__()
-
-            self.worker.send_json(formatted_request)
-        except:
-            logging.info("Could not send the request to the remote endpoint ({}:{}).".format(self.host, self.port))
-            self.is_connected = False
-
-    def __get_response__(self):
+    def _send_request(self, formatted_request):
         response = {}
 
-        try:
-            if self.is_connected:
-                response = self.worker.recv_json()
-                self.__disconnect__()
-            else:
-                logging.info("Endpoint not connected and can't receive ({}:{}).".format(self.host, self.port))
+        with self.lock:
+            try:
+                self._connect()
+                self.worker.send_json(formatted_request)
 
-        except:
-            logging.info("Could not receive the request's response the remote endpoint ({}:{}).".format(self.host,
-                                                                                                        self.port))
-            self.is_connected = False
+            except Exception as ex:
+                logging.info("Could not send the request to the remote endpoint ({}:{}). Reason: {}".format(self.host,
+                                                                                                            self.port,
+                                                                                                            ex))
+                self._disconnect()
+
+            try:
+                response = self.worker.recv_json()
+                self._disconnect()
+
+            except Exception as ex:
+                logging.info("Could not receive the response from the remote endpoint ({}:{}). Reason: {}".format(
+                                                                                                            self.host,
+                                                                                                            self.port,
+                                                                                                            ex))
+                self._disconnect()
 
         return response

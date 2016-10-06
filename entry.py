@@ -4,6 +4,7 @@ from time import sleep
 
 from main.crawler_service import CrawlerService
 from main.dataset.data_fetcher import DataFetcher
+from main.dataset.generic_dataset import GenericDataset
 from main.search_engine.bing_images import BingImages
 from main.search_engine.flickr_images import FlickrImages
 from main.search_engine.google_images import GoogleImages
@@ -27,17 +28,36 @@ root.addHandler(ch)
 
 __author__ = "Ivan de Paz Centeno"
 
-data_fetcher = DataFetcher("/home/ivan/res/test")
+search_session = SearchSession()
+search_session_remote = RemoteSearchSession("localhost")
+search_session_remote.load_session("/tmp/local-search-session.jsn")
 
-metadata = [{'height': '482', 'desc': '<b>ASD</b> 338 - Constantin Silvestri – Overtures - Humperdinck ...', 'width': '477', 'source': 'yahoo', 'url': 'http://www.classicalvinyl.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/a/s/asd338.jpg'},
-            {'height': '274', 'desc': 'Imágenes de Dexter - Series <b>ASD</b>', 'width': '450', 'source': 'yahoo', 'url': 'http://seriesasd.com/images/series/52cdf04745ca15b81900000a/thumb_lg.jpg'}]
+crawler = CrawlerService(search_session_remote, processes=2)
+crawler.start()
 
-data_fetcher.fetch_requests(metadata)
-data_fetcher.start()
+search_session_remote.wait_for_finish()
 
-sleep(10)
-data_fetcher.stop()
+dataset = GenericDataset("generic_image", search_session_remote, '/home/ivan/test_dataset/')
 
+dataset.fetch_data()
+dataset.build_metadata()
+print("************************************************")
+print("************************************************")
+print("************************************************")
+print("************************************************")
+print("************************************************")
+
+logging.info("Finishing dataset.")
+del dataset
+logging.info("Dataset finished.")
+search_session.stop()
+logging.info("Search_session finished.")
+crawler.stop()
+print("************************************************")
+print("************************************************")
+print("************************************************")
+print("************************************************")
+print("************************************************")
 
 """
 search_session = SearchSession()

@@ -16,6 +16,7 @@ class SearchSession(Service, SocketInterface):
     This search session is a way to centralize all the crawlers. This way we don't need to know where is each crawler
     and we only need to know where is this session. All the crawled data is going to end up here.
     """
+
     def __init__(self, host="0.0.0.0", port=24001, autostart=True):
         Service.__init__(self)
         SocketInterface.__init__(self, host, port)
@@ -90,7 +91,8 @@ class SearchSession(Service, SocketInterface):
         if len(self.search_requests) + len(self.search_history) == 0:
             result = 0
         else:
-            result = int(len(self.search_history) / (len(self.search_requests) + len(self.search_in_progress) + len(self.search_history)) * 100)
+            result = int(len(self.search_history) / (
+            len(self.search_requests) + len(self.search_in_progress) + len(self.search_history)) * 100)
 
         return result
 
@@ -187,13 +189,13 @@ class SearchSession(Service, SocketInterface):
         :return: the serialized version of this session.
         """
         data = {'search_requests': [self.search_requests[search_request_hash].serialize() for search_request_hash in
-                                   self.search_requests],
+                                    self.search_requests],
                 'search_history': [self.search_history[search_request_hash].serialize() for search_request_hash in
                                    self.search_history]}
 
         if dump_in_progress_as_pending:
             data['search_requests'] += [self.search_in_progress[search_request_hash].serialize() for search_request_hash
-                                       in self.search_in_progress]
+                                        in self.search_in_progress]
             logging.info("Search-request in progress dumped as new search_request: {}".format(data))
         else:
             data['search_in_progress'] = [self.search_in_progress[search_request_hash].serialize() for
@@ -245,6 +247,8 @@ class SearchSession(Service, SocketInterface):
 
             elif 'action' in request:
 
+                #logging.info(request)
+
                 {
                     'append_search_requests': self._append_search_requests,
                     'size': self._size,
@@ -252,7 +256,8 @@ class SearchSession(Service, SocketInterface):
                     'add_to_history': self._add_to_history,
                     'get_completion_progress': self._get_completion_progress,
                     'get_session_data': self._get_session_data,
-                    'set_session_data': self._set_session_data
+                    'set_session_data': self._set_session_data,
+                    'get_history': self._get_history
                 }[request['action']](identity, request)
 
         SocketInterface.terminate(self)
@@ -309,3 +314,15 @@ class SearchSession(Service, SocketInterface):
             result = False
 
         SocketInterface.send_response(self, identity, {'result': result})
+
+    def _get_history(self, identity, request):
+        logging.info("History requested.")
+        SocketInterface.send_response(self, identity, {'result':
+                                                       [self.search_history[search_request_hash].serialize() for
+                                                        search_request_hash in
+                                                        self.search_history]})
+
+        logging.info("History sent.")
+
+    def __del__(self):
+        self.stop()

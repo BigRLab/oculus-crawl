@@ -3,6 +3,8 @@
 import json
 import logging
 
+import time
+
 from main.search_session.search_request import SearchRequest
 from main.service.service_client import ServiceClient
 
@@ -26,12 +28,10 @@ class RemoteSearchSession(ServiceClient):
         :param search_requests:
         :return:
         """
-        self.__send_request__({
+        response = self._send_request({
             'action': 'append_search_requests',
             'search_requests': [request.serialize() for request in search_requests]
         })
-
-        response = self.__get_response__()
 
         if 'result' in  response:
             result = response['result'] == 'Done'
@@ -45,11 +45,9 @@ class RemoteSearchSession(ServiceClient):
         Retrieves a search request from the list of search requests of the search session.
         :return:
         """
-        self.__send_request__({
+        response = self._send_request({
             'action': 'pop_request'
         })
-
-        response = self.__get_response__()
 
         if 'result' in response and response['result']:
             result = SearchRequest.deserialize(response['result'])
@@ -68,12 +66,10 @@ class RemoteSearchSession(ServiceClient):
         :return:
         """
 
-        self.__send_request__({
+        response = self._send_request({
             'action': 'add_to_history',
             'search_request': search_request.serialize()
         })
-
-        response = self.__get_response__()
 
         if 'result' in response:
             result = response['result'] == 'Done'
@@ -83,11 +79,9 @@ class RemoteSearchSession(ServiceClient):
         return result
 
     def size(self):
-        self.__send_request__({
+        response = self._send_request({
             'action': 'size'
         })
-
-        response = self.__get_response__()
 
         if 'result' in response:
             result = response['result']
@@ -97,15 +91,17 @@ class RemoteSearchSession(ServiceClient):
         return result
 
     def get_completion_progress(self):
-        self.__send_request__({
-            'action': 'get_completion_progress'
-        })
+        try:
+            response = self._send_request({
+                'action': 'get_completion_progress'
+            })
 
-        response = self.__get_response__()
-
-        if 'result' in response:
-            result = response['result']
-        else:
+            if 'result' in response:
+                result = response['result']
+            else:
+                result = False
+        except Exception as ex:
+            logging.info("Error while get_completion_progress from search_session stub: {}".format(ex))
             result = False
 
         return result
@@ -117,28 +113,28 @@ class RemoteSearchSession(ServiceClient):
         :param filename: URI to the file.
         :return: True if could be saved. False otherwise.
         """
-        self.__send_request__({
+        response = self._send_request({
             'action': 'get_session_data',
             'dump_in_progress_as_pending': dump_in_progress_as_pending
         })
 
-        serial = self.__get_response__()
-        if 'result' in serial:
-            serial = serial['result']
+        if 'result' in response:
+            response = response['result']
 
-        logging.info(serial)
+        logging.info(response)
         try:
-            assert ('search_requests' in serial)
-            assert ('search_history' in serial)
+            assert ('search_requests' in response)
+            assert ('search_history' in response)
 
             with open(filename, 'w') as outfile:
-                json.dump(serial, outfile)
+                json.dump(response, outfile)
 
             result = True
             logging.info("Session file saved in {}".format(filename))
-        except:
+
+        except Exception as ex:
             result = False
-            logging.info("Could not save the file because of remote malformed response")
+            logging.info("Could not save the file because of remote malformed response. Reason: {}".format(ex))
 
         return result
 
@@ -153,25 +149,50 @@ class RemoteSearchSession(ServiceClient):
             with open(filename, 'r') as infile:
                 data = json.load(infile)
 
-            self.__send_request__({
+            response = self._send_request({
                 'action': 'set_session_data',
                 'data': data,
                 'load_in_progress_as_pending': load_in_progress_as_pending
             })
 
-            response = self.__get_response__()
-
             if 'result' in response:
                 result = response['result']
+                logging.info("Session loaded from file {}".format(filename))
             else:
                 result = False
+                logging.info("Couldn't load session. Reason: remote endpoint didn't return a well-formatted response.")
 
-        except:
+        except Exception as ex:
             result = False
+            logging.info("Session couldn't be loaded. Reason: {}".format(ex))
 
-        if result:
-            logging.info("Session loaded from file {}".format(filename))
-        else:
-            logging.info("Session couldn't be loaded!")
 
         return result
+
+    def get_history(self):
+        """
+        Retrieves the history from the session.
+        :return: The history data
+        """
+        logging.info("Retrieving history...")
+        response = self._send_request({
+            'action': 'get_history'
+        })
+        logging.info("Retrieved: {}".format(response))
+
+        result = {}
+
+        if 'result' in response and response['result']:
+            history_search_requests = [SearchRequest.deserialize(serial) for serial in response['result']]
+
+            for search_request in history_search_requests:
+                result[search_request.__hash__()] = search_request
+
+        return result
+
+    def wait_for_finish(self):
+        """
+        Freezes the thread until the process is finished.
+        """
+        while self.get_completion_progress() != 100:
+            time.sleep(1)

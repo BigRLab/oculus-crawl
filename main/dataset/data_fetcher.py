@@ -13,7 +13,7 @@ QUEUE_MIN_BUFFER = 100
 
 class DataFetcher(FetchPool, Service):
     def __init__(self, to_folder):
-        FetchPool.__init__(self)
+        FetchPool.__init__(self, pool_limit=20)
         Service.__init__(self)
         self.database = MemDatabase(to_folder)
 
@@ -42,7 +42,23 @@ class DataFetcher(FetchPool, Service):
         self.__set_status__(SERVICE_STOPPED)
 
     def fetch_requests(self, request_list):
+        """
+        Fetchs the data url associated with the request.
+
+        :param request_list: a list of JSON-formatted results retrieved from the search_session-crawled requests.
+        :return:
+        """
         [self.database.append(request['url'], request) for request in request_list]
 
     def process_finished(self, wrapped_result):
-        self.database.add_result_data(wrapped_result[0], wrapped_result[1])
+        self.database.add_result_data(wrapped_result[0], wrapped_result[1], wrapped_result[2])
+
+    def get_percent_done(self):
+        return self.database.get_percent_done()
+
+    def get_results(self):
+        """
+        Retrieves the results from the database, in JSON format that can be used to build a metadata for the dataset.
+        :return:
+        """
+        return self.database.get_result_data()

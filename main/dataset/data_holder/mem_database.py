@@ -3,6 +3,9 @@
 import logging
 import os
 
+import io
+from PIL import Image
+
 __author__ = "Ivan de Paz Centeno"
 
 
@@ -13,6 +16,7 @@ class MemDatabase(object):
         self.urls = []
         self.result_data = {}
         self.number_count = {}
+        self.in_progress = {}
         self.to_folder = to_folder
 
     def append(self, url, metadata):
@@ -26,17 +30,22 @@ class MemDatabase(object):
 
         if len(self.urls) > 0:
             url = self.urls.pop()
+            self.in_progress[url] = True
         else:
             url = None
 
         return url
 
-    def add_result_data(self, url, image_bytes):
+    def add_result_data(self, url, image_bytes, extension):
 
-        logging.info("Adding url {}".format(url))
         # We cache the images by their hash
         image_hash = url  # get_image_hash(image_bytes)
         metadata = self.get_value(url)
+        metadata['extension'] = extension
+
+        if not image_bytes:
+            del self.in_progress[url]
+            return
 
         if image_hash in self.result_data:
 
@@ -50,19 +59,17 @@ class MemDatabase(object):
             self.result_data[image_hash]['metadata']['desc'] += metadata['desc']
             logging.info("Adding to existing url {}".format(url))
         else:
-            logging.info("Hi")
             uri = self._generate_uri(metadata)
             self.result_data[image_hash]= {'metadata' : metadata}
-            logging.info("Ho")
             self.result_data[image_hash]['metadata']['url'] = [url]
-            logging.info("Hu")
             self.result_data[image_hash]['metadata']['source'] = [metadata['source']]
 
-            logging.info("Saving url {}".format(url))
             self._save_image_bytes(image_bytes, uri)
             logging.info("Saved url {} in {}".format(url, uri))
 
             self.result_data[image_hash]['metadata']['uri'] = [uri]
+
+        del self.in_progress[url]
 
     def _generate_uri(self, metadata):
 
@@ -73,10 +80,27 @@ class MemDatabase(object):
 
         self.number_count[metadata['source']] += 1
 
-        return "{}.jpg".format(os.path.join(self.to_folder, metadata['source'], str(number)))
+        return "{}{}".format(os.path.join(self.to_folder, metadata['source'], str(number)), metadata['extension'])
+
+    def get_percent_done(self):
+        if len(self.urls) + len(self.in_progress) == 0:
+            result = 0
+        else:
+            result = int(len(self.result_data) / (len(self.urls) + len(self.in_progress)) * 100)
+
+        return result
 
     @staticmethod
     def _save_image_bytes(image_bytes, uri):
 
+        #image = Image.open(io.BytesIO(image_bytes))
+        directory = os.path.dirname(uri)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
         with open(uri, "wb") as file:
             file.write(image_bytes)
+        #image.save(uri)
+
+    def get_result_data(self):
+        return self.result_data

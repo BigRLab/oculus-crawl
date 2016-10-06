@@ -60,7 +60,7 @@ class SocketInterface(object):
                 if not ('action' in formatted_request):
 
                     socket.send_string(identity, zmq.SNDMORE)
-                    socket.send_json({'error':'Invalid request'})
+                    socket.send_json({'error': 'Invalid request'})
 
                 else:
 

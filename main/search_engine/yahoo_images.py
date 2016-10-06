@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 
 __author__ = "Ivan de Paz Centeno"
 
-MAX_IMAGES_PER_REQUEST = 750
+MAX_IMAGES_PER_REQUEST = 150
 MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD = 3
 
 
@@ -85,22 +85,26 @@ class YahooImages(object):
         no_update_count = 0
 
         while not finished:
-            logging.info("images cached previously: {}, images cached currently: {}".format(previous_percent, current_percent))
+            try:
+                logging.info("images cached previously: {}, images cached currently: {}".format(previous_percent, current_percent))
 
-            if current_percent > MAX_IMAGES_PER_REQUEST or no_update_count > MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD:
+                if current_percent > MAX_IMAGES_PER_REQUEST or no_update_count > MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD:
+                    finished = True
+                    continue
+
+                if previous_percent == current_percent:
+                    no_update_count +=1
+                    self.transport_core.click_button_by_class("more-res")
+                else:
+                    no_update_count = 0
+
+                previous_percent = current_percent
+                self.transport_core.scroll_to_bottom()
+                elements = self.transport_core.get_elements_html_by_class("ld ")
+                current_percent = len(elements)
+            except Exception as ex:
+                logging.info("Error: {}".format(str(ex)))
                 finished = True
-                continue
-
-            if previous_percent == current_percent:
-                no_update_count +=1
-                self.transport_core.click_button_by_class("more-res")
-            else:
-                no_update_count = 0
-
-            previous_percent = current_percent
-            self.transport_core.scroll_to_bottom()
-            elements = self.transport_core.get_elements_html_by_class("ld ")
-            current_percent = len(elements)
 
     @staticmethod
     def _prepend_http_protocol(url):

@@ -5,11 +5,25 @@ from multiprocessing import Manager
 from multiprocessing.pool import Pool
 from queue import Empty
 from time import sleep
+from mimetypes import guess_extension
+from os.path import splitext
+from urllib.parse import urlparse
 import logging
 
 __author__ = "Ivan de Paz Centeno"
 
 wait_seconds_between_requests = 0
+
+
+def inferre_extension(download_url):
+    try:
+        inferred_extension = splitext(urlparse(download_url).path)[1]
+
+    except Exception as ex:
+        inferred_extension = None
+        logging.info("Couldn't inferre the extension from the url {}.".format(download_url))
+
+    return inferred_extension
 
 
 def process(queue_element):
@@ -21,7 +35,7 @@ def process(queue_element):
     """
     global wait_seconds_between_requests
 
-    print("wait seconds: {}".format(wait_seconds_between_requests))
+    #print("wait seconds: {}".format(wait_seconds_between_requests))
     if wait_seconds_between_requests > 0:
         sleep(wait_seconds_between_requests)
 
@@ -31,13 +45,26 @@ def process(queue_element):
 
     try:
         req = Request(download_url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36'})
-        data = urlopen(req).read()
-        logging.info("Downloaded url {}".format(download_url))
+        source = urlopen(req)
+        data = source.read()
+        headers = source.info()
+
+        if 'Content-Type' in headers:
+            extension = guess_extension(headers['Content-Type'])
+        else:
+            extension = None
+
+        if not extension:
+            extension = inferre_extension(download_url)
+
+        logging.info("Downloaded url {} (mime-type-extension: {})".format(download_url, extension))
+
     except Exception as e:
         data = None
+        extension = ""
         logging.info("Failed to download {}; reason: {}".format(download_url, str(e)))
 
-    return [download_url, data]
+    return [download_url, data, extension]
 
 
 class FetchPool(object):
@@ -47,7 +74,7 @@ class FetchPool(object):
     """
 
     def __init__(self, pool_limit=10, time_secs_between_requests=None):
-        # 10 concurrent downloads is a good ammount
+        # 10 concurrent downloads is a good ammount (pool_limit)
         self.manager = Manager()
         self.processing_queue = self.manager.Queue()
 
