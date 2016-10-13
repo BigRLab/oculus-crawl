@@ -8,6 +8,7 @@ from main.dataset.generic_dataset import GenericDataset
 from main.search_engine.bing_images import BingImages
 from main.search_engine.flickr_images import FlickrImages
 from main.search_engine.google_images import GoogleImages
+from main.search_engine.howold_images import HowOldImages
 from main.search_engine.yahoo_images import YahooImages
 from main.search_session.remote_search_session import RemoteSearchSession
 from main.search_session.search_request import SearchRequest
@@ -29,15 +30,17 @@ root.addHandler(ch)
 __author__ = "Ivan de Paz Centeno"
 
 search_session = SearchSession()
-search_session_remote = RemoteSearchSession("localhost")
-search_session_remote.load_session("/tmp/local-search-session.jsn")
+#search_session_remote = RemoteSearchSession("localhost")
+#search_session_remote.load_session("/tmp/local-search-session.jsn")
+search_request = SearchRequest("1 year old girl", {}, search_engine_proto=HowOldImages)
+search_session.append_search_requests([search_request])
 
-crawler = CrawlerService(search_session_remote, processes=2)
+crawler = CrawlerService(search_session, processes=1)
 crawler.start()
 
-search_session_remote.wait_for_finish()
+search_session.wait_for_finish()
 
-dataset = GenericDataset("generic_image", search_session_remote, '/home/ivan/test_dataset/')
+dataset = GenericDataset("generic_image", search_session, '/home/ivan/test_dataset/')
 
 dataset.fetch_data()
 dataset.build_metadata()

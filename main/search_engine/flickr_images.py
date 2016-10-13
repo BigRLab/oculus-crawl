@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from PIL import ImageFile
-
-from main.search_engine.search_engines import SEARCH_ENGINES
+from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
 from main.transport_core.webcore import WebCore
 import urllib
 import urllib.request
@@ -14,13 +12,10 @@ __author__ = "Ivan de Paz Centeno"
 MAX_IMAGES_PER_REQUEST = 750    # This will take between 20 and 30 minutes
 
 
-class FlickrImages(object):
+class FlickrImages(SearchEngine):
     """
     Search engine that retrieves information of images from the flickr images search engine.
     """
-
-    def __init__(self):
-        self.transport_core = WebCore(window_size=(1300, 1500))  # It is the preferable and the default transport core for Flickr.
 
     def retrieve(self, search_request):
         """
@@ -42,7 +37,7 @@ class FlickrImages(object):
         result = []
 
         # TODO: add search options for this search engine. They can be encoded in the URL.
-        url = "https://www.flickr.com/search/?tags="+search_words+"&media=photos"
+        url = "https://www.flickr.com/search/?tags={}&media=photos".format(search_words)
         logging.info("Built url ({}) for request.".format(url))
 
         self.transport_core.get(url)
@@ -57,7 +52,7 @@ class FlickrImages(object):
 
         count = 0
         while count < MAX_IMAGES_PER_REQUEST:
-            image_json = self._retrieve_image_json()
+            image_json = self._retrieve_image_json(search_words)
 
             if 'url' in image_json:
                 result.append(image_json)
@@ -66,7 +61,7 @@ class FlickrImages(object):
 
         return result
 
-    def _retrieve_image_json(self):
+    def _retrieve_image_json(self, search_words):
 
         image_json = {}
 
@@ -82,59 +77,12 @@ class FlickrImages(object):
             date_taken = BeautifulSoup(self.transport_core.get_elements_html_by_class("date-taken-label", False)[0], 'html.parser').find()["title"]
             tag_description = [tag["title"] for tag in tags]
 
-            image_json['desc'] = "{};{}".format(date_taken, ";".join(tag_description))
+            image_json['desc'] = "{};{};{}".format(date_taken, ";".join(tag_description), search_words)
             image_json['source'] = "flickr"
         # ELSE: We skip this iteration because it is spam
 
         return image_json
 
-    @staticmethod
-    def _get_url_size(url):
-        """
-        Request the size (width and height) of a URL image.
-        :param url:
-        :return: [width, height]
-        """
-        size = [0, 0]
-
-        with urllib.request.urlopen(url) as file:
-            image_parser = ImageFile.Parser()
-
-            while True:
-                data = file.read(1024)
-
-                if not data:
-                    break
-
-                image_parser.feed(data)
-
-                if image_parser.image:
-                    size = image_parser.image.size
-                    break
-
-        return size
-
-    @staticmethod
-    def _prepend_http_protocol(url, is_ssl=False):
-        if url.lower()[:7] == "http://" or url.lower()[:8] == "https://":
-            prepend_text = ""
-        elif url[:2] == "//":
-            prepend_text = "http"
-
-            if is_ssl:
-                prepend_text += "s"
-
-            prepend_text += ":"
-
-        else:
-            prepend_text = "http"
-
-            if is_ssl:
-                prepend_text += "s"
-
-            prepend_text += "://"
-
-        return prepend_text + url
 
 # Register the class to enable deserialization.
 SEARCH_ENGINES[str(FlickrImages)] = FlickrImages

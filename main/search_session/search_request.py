@@ -3,7 +3,7 @@
 from main.search_engine.google_images import GoogleImages
 from main.transport_core.webcore import WebCore
 from main.transport_core.transport_cores import TRANSPORT_CORES
-from main.search_engine.search_engines import SEARCH_ENGINES
+from main.search_engine.search_engine import SEARCH_ENGINES
 
 __author__ = "Ivan de Paz Centeno"
 

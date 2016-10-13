@@ -83,10 +83,10 @@ class MemDatabase(object):
         return "{}{}".format(os.path.join(self.to_folder, metadata['source'], str(number)), metadata['extension'])
 
     def get_percent_done(self):
-        if len(self.urls) + len(self.in_progress) == 0:
+        if len(self.urls) + len(self.in_progress) + len(self.result_data)== 0:
             result = 0
         else:
-            result = int(len(self.result_data) / (len(self.urls) + len(self.in_progress)) * 100)
+            result = int(len(self.result_data) / (len(self.urls) + len(self.in_progress) + len(self.result_data)) * 100)
 
         return result
 

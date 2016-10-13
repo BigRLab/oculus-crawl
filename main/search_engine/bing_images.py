@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import re
-from main.search_engine.search_engines import SEARCH_ENGINES
+from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
 
 from main.transport_core.webcore import WebCore
 import json
@@ -14,13 +14,10 @@ MAX_IMAGES_PER_REQUEST = 900
 MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD = 3
 
 
-class BingImages(object):
+class BingImages(SearchEngine):
     """
     Search engine that retrieves information of images from the bing images search engine.
     """
-
-    def __init__(self):
-        self.transport_core = WebCore()  # It is the preferable and the default transport core for Bing.
 
     def retrieve(self, search_request):
         """
@@ -41,7 +38,7 @@ class BingImages(object):
 
     def _retrieve_image_links_data(self, search_words, search_options):
 
-        url = "http://www.bing.com/images/search?&q=asd"
+        url = "http://www.bing.com/images/search?&q={}".format(search_words)
 
         # We enable the face option if needed.
         if 'face' in search_options:
@@ -61,7 +58,7 @@ class BingImages(object):
 
         logging.info("dg_elements loaded. Building json for each element...")
 
-        result = [self._build_json_for(element) for element in dg_u_elements]
+        result = [self._build_json_for(element, search_words) for element in dg_u_elements]
 
         logging.info("Retrieved {} elements".format(len(result)))
         return result
@@ -95,16 +92,7 @@ class BingImages(object):
             elements = self.transport_core.get_elements_html_by_class("dg_u")
             current_percent = len(elements)
 
-    @staticmethod
-    def _prepend_http_protocol(url):
-        if url.lower()[:7] == "http://" or url.lower()[:8] == "https://":
-            prepend_text = ""
-        else:
-            prepend_text = "http://"
-
-        return prepend_text + url
-
-    def _build_json_for(self, element):
+    def _build_json_for(self, element, search_words):
         element = element.find("a")
         logging.info("Building for element {}".format(element))
 
@@ -120,7 +108,7 @@ class BingImages(object):
         result = {'url': self._prepend_http_protocol(json_data['imgurl']),
                   'width': width,
                   'height': height,
-                  'desc': description,
+                  'desc': description+";"+search_words,
                   'source': 'bing'}
         logging.info("Result: {}".format(result))
 

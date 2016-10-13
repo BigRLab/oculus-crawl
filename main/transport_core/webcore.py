@@ -63,6 +63,15 @@ class WebCore(object):
         return [element.get_attribute(attribute) for element in
                 self.virtual_browser.find_elements_by_tag_name(tag_name)]
 
+    def get_elements_html_by_id(self, id, innerHTML=True):
+        if innerHTML:
+            attribute = 'innerHTML'
+        else:
+            attribute = 'outerHTML'
+
+        return [element.get_attribute(attribute) for element in
+                self.virtual_browser.find_elements_by_id(id)]
+
     def scroll_to_bottom(self):
         self.virtual_browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         logging.info("Scrolling to the bottom")
@@ -85,6 +94,8 @@ class WebCore(object):
     def wait_for_elements_from_class(self, class_name):
         sleep(0.5)
         WebDriverWait(self.virtual_browser, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, class_name)))
+
+
 
 # Register the class to enable deserialization.
 TRANSPORT_CORES[str(WebCore)] = WebCore

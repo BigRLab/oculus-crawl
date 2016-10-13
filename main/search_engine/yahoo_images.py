@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import html
 
-from main.search_engine.search_engines import SEARCH_ENGINES
+from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
 from main.transport_core.webcore import WebCore
 import urllib
 import urllib.parse as urlparse
@@ -16,13 +16,10 @@ MAX_IMAGES_PER_REQUEST = 150
 MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD = 3
 
 
-class YahooImages(object):
+class YahooImages(SearchEngine):
     """
     Search engine that retrieves information of images from the yahoo images search engine.
     """
-
-    def __init__(self):
-        self.transport_core = WebCore()  # It is the preferable and the default transport core for Yahoo.
 
     def retrieve(self, search_request):
         """
@@ -67,7 +64,7 @@ class YahooImages(object):
         ld_elements = [BeautifulSoup(html_element, 'html.parser').find() for html_element in
                        self.transport_core.get_elements_html_by_class("ld ", False)]
 
-        result = [self._build_json_for(element) for element in ld_elements]
+        result = [self._build_json_for(element, search_words) for element in ld_elements]
 
         logging.info("Retrieved {} elements".format(len(result)))
         return result
@@ -106,16 +103,7 @@ class YahooImages(object):
                 logging.info("Error: {}".format(str(ex)))
                 finished = True
 
-    @staticmethod
-    def _prepend_http_protocol(url):
-        if url.lower()[:7] == "http://" or url.lower()[:8] == "https://":
-            prepend_text = ""
-        else:
-            prepend_text = "http://"
-
-        return prepend_text + url
-
-    def _build_json_for(self, element):
+    def _build_json_for(self, element, search_words):
 
         if element.has_attr('data'):
             data = element["data"]
@@ -126,7 +114,7 @@ class YahooImages(object):
             json_data = json.loads(html.unescape(data))
             result = {'url': self._prepend_http_protocol(json_data['iurl']), 'width': json_data['w'],
                       'height': json_data['h'],
-                      'desc': json_data['alt'],
+                      'desc': json_data['alt']+";"+search_words,
                       'source': 'yahoo'}
         else:
             link = element.find("a")
@@ -134,7 +122,8 @@ class YahooImages(object):
                 href = link["href"]
                 parsed_href = urlparse.parse_qs(urlparse.urlparse(href).query)
                 result = {'url': self._prepend_http_protocol(parsed_href['imgurl'][0]), 'width': parsed_href['w'][0],
-                          'height': parsed_href['h'][0], 'desc': parsed_href['name'][0], 'source': 'yahoo'}
+                          'height': parsed_href['h'][0], 'desc': parsed_href['name'][0]+";"+search_words,
+                          'source': 'yahoo'}
             else:
                 result = {}
 

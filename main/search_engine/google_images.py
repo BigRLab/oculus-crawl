@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from main.search_engine.search_engines import SEARCH_ENGINES
+from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
 from main.transport_core.webcore import WebCore
 import urllib
 import json
@@ -9,13 +9,10 @@ import logging
 __author__ = "Ivan de Paz Centeno"
 
 
-class GoogleImages(object):
+class GoogleImages(SearchEngine):
     """
     Search engine that retrieves information of images in the google images tab from google.
     """
-
-    def __init__(self):
-        self.transport_core = WebCore()     # It is the preferable and the default transport core for Google.
 
     def retrieve(self, search_request):
         """
@@ -52,7 +49,7 @@ class GoogleImages(object):
         json_elements = [json.loads(element) for element in self.transport_core.get_elements_html_by_class("rg_meta")]
 
         logging.info("Retrieved {} elements".format(len(json_elements)))
-        return [{'url': image['ou'], 'width': image['ow'], 'height': image['oh'], 'desc': image['pt'],
+        return [{'url': image['ou'], 'width': image['ow'], 'height': image['oh'], 'desc': image['pt']+";"+search_words,
                  'source':'google'} for image in json_elements]
 
     def _cache_all_page(self):
