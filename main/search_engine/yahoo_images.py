@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 
 __author__ = "Ivan de Paz Centeno"
 
-MAX_IMAGES_PER_REQUEST = 150
+MAX_IMAGES_PER_REQUEST = 740
 MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD = 3
 
 

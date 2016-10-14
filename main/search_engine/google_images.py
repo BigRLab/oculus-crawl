@@ -65,7 +65,7 @@ class GoogleImages(SearchEngine):
 
         while previous_percent < current_percent:
             previous_percent = current_percent
-            #self.transport_core.scroll_to_bottom()
+            self.transport_core.scroll_to_bottom()
             elements = self.transport_core.get_elements_html_by_class("rg_meta")
             current_percent = len(elements)
 

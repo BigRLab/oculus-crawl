@@ -40,18 +40,19 @@ if os.path.exists("/home/ivan/session_now.ses"):
     search_session.load_session("/home/ivan/session_now.ses")
 else:
     search_session.append_search_requests([
-            #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=HowOldImages),
+            SearchRequest("1 year old girl", {'face': True}, search_engine_proto=HowOldImages),
             SearchRequest("1 year old girl", {'face': True}, search_engine_proto=GoogleImages),
-            #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=YahooImages),
-            #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=FlickrImages),
+            SearchRequest("1 year old girl", {'face': True}, search_engine_proto=YahooImages),
+            SearchRequest("1 year old girl", {'face': True}, search_engine_proto=FlickrImages),
             SearchRequest("1 year old girl", {'face': True}, search_engine_proto=BingImages),
     ])
 
-    crawler = CrawlerService(search_session, processes=5)
-    crawler.start()
-    search_session.wait_for_finish()
-    search_session.save_session("/home/ivan/session_now.ses")
-    started = True
+
+crawler = CrawlerService(search_session, processes=5)
+crawler.start()
+search_session.wait_for_finish()
+crawler.stop()
+search_session.save_session("/home/ivan/session_now.ses")
 
 dataset = GenericDataset("generic_image", search_session, '/home/ivan/test_dataset/')
 
@@ -69,8 +70,7 @@ logging.info("Dataset finished.")
 search_session.stop()
 logging.info("Search_session finished.")
 
-if started:
-    crawler.stop()
+
 print("************************************************")
 print("************************************************")
 print("************************************************")

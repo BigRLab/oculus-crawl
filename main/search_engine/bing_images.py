@@ -10,8 +10,8 @@ from bs4 import BeautifulSoup
 
 __author__ = "Ivan de Paz Centeno"
 
-#MAX_IMAGES_PER_REQUEST = 900
-MAX_IMAGES_PER_REQUEST = 100
+MAX_IMAGES_PER_REQUEST = 900
+#MAX_IMAGES_PER_REQUEST = 100
 MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD = 3
 
 
@@ -89,7 +89,7 @@ class BingImages(SearchEngine):
                 no_update_count = 0
 
             previous_percent = current_percent
-            #self.transport_core.scroll_to_bottom()
+            self.transport_core.scroll_to_bottom()
             elements = self.transport_core.get_elements_html_by_class("dg_u")
             current_percent = len(elements)
 

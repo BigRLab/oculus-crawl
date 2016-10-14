@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
-from main.transport_core.webcore import WebCore
 import urllib
-import json
 import logging
 from bs4 import BeautifulSoup
-from PIL import ImageFile
 
 __author__ = "Ivan de Paz Centeno"
 
@@ -57,7 +54,7 @@ class HowOldImages(SearchEngine):
     def _build_json_for(self, image_tag, search_words):
         url = image_tag['src']
         image_size = self._get_url_size(url)
-        #print("image size: ", image_size)
+
         return {'url': image_tag['src'], 'width': image_size[0], 'height': image_size[1], 'desc': search_words,
                 'source': 'howold'}
 

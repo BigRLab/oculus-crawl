@@ -9,8 +9,8 @@ from bs4 import BeautifulSoup
 
 __author__ = "Ivan de Paz Centeno"
 
-#MAX_IMAGES_PER_REQUEST = 750    # This will take between 20 and 30 minutes
-MAX_IMAGES_PER_REQUEST = 4
+MAX_IMAGES_PER_REQUEST = 750    # This will take between 20 and 30 minutes
+#MAX_IMAGES_PER_REQUEST = 4
 
 
 class FlickrImages(SearchEngine):
