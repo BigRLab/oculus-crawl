@@ -55,53 +55,27 @@ class MemDatabase(object):
             del self.in_progress[url]
             return
 
-        if image_hash in self.result_data:
-            # We found the same image but probably with different URL or different metadata.
-            url_already_cached = url in self.result_data[image_hash]['metadata']['url']
-
-            if not url_already_cached:
-                self.result_data[image_hash]['metadata']['url'].append(url)
-                # Same image, Different URL
-                for metadata in metadatas:
-                    if metadata['source'] not in self.result_data[image_hash]['metadata']['source']:
-                        # Same image, Different URL, Different Search-Engine
-                        self.result_data[image_hash]['metadata']['source'].append(metadata['source'])
-                    #else:
-                        # Same image, Different URL, Same Search-Engine
-
-                    if metadata['desc'] not in self.result_data[image_hash]['metadata']['desc']:
-                        self.result_data[image_hash]['metadata']['desc'] += metadata['desc']
-
-            else:
-                # Same image, Same URL,
-                for metadata in metadatas:
-                    if metadata['source'] not in self.result_data[image_hash]['metadata']['source']:
-                        # Same image, Same URL, Different Search-Engine
-                        self.result_data[image_hash]['metadata']['source'].append(metadata['source'])
-                        self.result_data[image_hash]['metadata']['desc'] += metadata['desc']
-
-                    if metadata['desc'] not in self.result_data[image_hash]['metadata']['desc']:
-                        self.result_data[image_hash]['metadata']['desc'] += metadata['desc']
-
-            logging.debug("Adding to existing image hash")
-
-        else:
+        if image_hash not in self.result_data:
             [absolute_uri, relative_uri] = self._generate_uri(metadatas[0])
-            self.result_data[image_hash]= {'metadata' : metadatas[0]}
+            self.result_data[image_hash]= {'metadata': metadatas[0].copy()}
 
-            self.result_data[image_hash]['metadata']['url'] = [url]
-            self.result_data[image_hash]['metadata']['source'] = [metadatas[0]['source']]
-
-            for metadata in metadatas:
-                if metadata['source'] not in self.result_data[image_hash]['metadata']['source']:
-                    # Same image, Same URL, Different Search-Engine
-                    self.result_data[image_hash]['metadata']['source'].append(metadata['source'])
-                    self.result_data[image_hash]['metadata']['desc'] += metadata['desc']
+            self.result_data[image_hash]['metadata']['url'] = []
+            self.result_data[image_hash]['metadata']['source'] = []
+            self.result_data[image_hash]['metadata']['desc'] = ""
+            self.result_data[image_hash]['metadata']['uri'] = [relative_uri]
 
             self._save_image_bytes(image_bytes, absolute_uri)
             logging.debug("Saved url {} in {}".format(url, absolute_uri))
 
-            self.result_data[image_hash]['metadata']['uri'] = [relative_uri]
+        if url not in self.result_data[image_hash]['metadata']['url']:
+            self.result_data[image_hash]['metadata']['url'].append(url)
+
+        for metadata in metadatas:
+            if metadata['source'] not in self.result_data[image_hash]['metadata']['source']:
+                self.result_data[image_hash]['metadata']['source'].append(metadata['source'])
+
+            if metadata['desc'] not in self.result_data[image_hash]['metadata']['desc']:
+                self.result_data[image_hash]['metadata']['desc'] += metadata['desc'] + ";"
 
         del self.in_progress[url]
 
