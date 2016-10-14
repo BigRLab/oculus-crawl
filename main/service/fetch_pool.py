@@ -41,7 +41,7 @@ def process(queue_element):
 
     # We fetch the search variables from the queue element
     download_url = queue_element[0]
-    logging.info("Processing url {}.".format(download_url))
+    logging.debug("Processing url {}.".format(download_url))
 
     try:
         req = Request(download_url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36'})
@@ -57,12 +57,12 @@ def process(queue_element):
         if not extension:
             extension = inferre_extension(download_url)
 
-        logging.info("Downloaded url {} (mime-type-extension: {})".format(download_url, extension))
+        logging.debug("Downloaded url {} (mime-type-extension: {})".format(download_url, extension))
 
     except Exception as e:
         data = None
         extension = ""
-        logging.info("Failed to download {}; reason: {}".format(download_url, str(e)))
+        logging.debug("Failed to download {}; reason: {}".format(download_url, str(e)))
 
     return [download_url, data, extension]
 
@@ -103,7 +103,7 @@ class FetchPool(object):
         :param url: download url
         :return:
         """
-        logging.info("Queued url to download {}.".format(url))
+        logging.debug("Queued url to download {}.".format(url))
         self.processing_queue.put([url])
         self.process_queue()
 
@@ -116,14 +116,14 @@ class FetchPool(object):
         while self.processes_free > 0 and not self.stop_processing:
             try:
                 queue_element = self.processing_queue.get(False)
-                logging.info(
+                logging.debug(
                     "Processing queue with {} free processes (stop flag is {}).".format(self.processes_free,
                                                                                         self.stop_processing))
                 self.processes_free -= 1
                 result = self.pool.apply_async(process, args=(queue_element,), callback=self._process_finished)
 
             except Empty:
-                logging.info("No elements queued.")
+                logging.debug("No elements queued.")
 
                 return
 

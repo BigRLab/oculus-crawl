@@ -10,7 +10,8 @@ from bs4 import BeautifulSoup
 
 __author__ = "Ivan de Paz Centeno"
 
-MAX_IMAGES_PER_REQUEST = 900
+#MAX_IMAGES_PER_REQUEST = 900
+MAX_IMAGES_PER_REQUEST = 100
 MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD = 3
 
 
@@ -88,13 +89,13 @@ class BingImages(SearchEngine):
                 no_update_count = 0
 
             previous_percent = current_percent
-            self.transport_core.scroll_to_bottom()
+            #self.transport_core.scroll_to_bottom()
             elements = self.transport_core.get_elements_html_by_class("dg_u")
             current_percent = len(elements)
 
     def _build_json_for(self, element, search_words):
         element = element.find("a")
-        logging.info("Building for element {}".format(element))
+        #logging.info("Building for element {}".format(element))
 
         description = element['t1']
         size = element['t2']
@@ -110,7 +111,7 @@ class BingImages(SearchEngine):
                   'height': height,
                   'desc': description+";"+search_words,
                   'source': 'bing'}
-        logging.info("Result: {}".format(result))
+        #logging.info("Result: {}".format(result))
 
         return result
 

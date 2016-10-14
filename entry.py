@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 from time import sleep
 
 from main.crawler_service import CrawlerService
@@ -32,13 +33,25 @@ __author__ = "Ivan de Paz Centeno"
 search_session = SearchSession()
 #search_session_remote = RemoteSearchSession("localhost")
 #search_session_remote.load_session("/tmp/local-search-session.jsn")
-search_request = SearchRequest("1 year old girl", {}, search_engine_proto=HowOldImages)
-search_session.append_search_requests([search_request])
 
-crawler = CrawlerService(search_session, processes=1)
-crawler.start()
+started = False
 
-search_session.wait_for_finish()
+if os.path.exists("/home/ivan/session_now.ses"):
+    search_session.load_session("/home/ivan/session_now.ses")
+else:
+    search_session.append_search_requests([
+            #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=HowOldImages),
+            SearchRequest("1 year old girl", {'face': True}, search_engine_proto=GoogleImages),
+            #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=YahooImages),
+            #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=FlickrImages),
+            SearchRequest("1 year old girl", {'face': True}, search_engine_proto=BingImages),
+    ])
+
+    crawler = CrawlerService(search_session, processes=5)
+    crawler.start()
+    search_session.wait_for_finish()
+    search_session.save_session("/home/ivan/session_now.ses")
+    started = True
 
 dataset = GenericDataset("generic_image", search_session, '/home/ivan/test_dataset/')
 
@@ -55,7 +68,9 @@ del dataset
 logging.info("Dataset finished.")
 search_session.stop()
 logging.info("Search_session finished.")
-crawler.stop()
+
+if started:
+    crawler.stop()
 print("************************************************")
 print("************************************************")
 print("************************************************")

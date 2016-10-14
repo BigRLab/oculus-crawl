@@ -9,7 +9,10 @@ __author__ = "Ivan de Paz Centeno"
 
 
 class SearchRequest(object):
-    def __init__(self, words, options, search_engine_proto=GoogleImages, transport_core_proto=WebCore):
+    def __init__(self, words, options=None, search_engine_proto=GoogleImages, transport_core_proto=WebCore):
+        if not options:
+            options = {}
+
         self.words = words
         self.options = options
         self.transport_core_proto = transport_core_proto

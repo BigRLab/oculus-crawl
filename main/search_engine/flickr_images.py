@@ -9,7 +9,8 @@ from bs4 import BeautifulSoup
 
 __author__ = "Ivan de Paz Centeno"
 
-MAX_IMAGES_PER_REQUEST = 750    # This will take between 20 and 30 minutes
+#MAX_IMAGES_PER_REQUEST = 750    # This will take between 20 and 30 minutes
+MAX_IMAGES_PER_REQUEST = 4
 
 
 class FlickrImages(SearchEngine):
@@ -57,7 +58,9 @@ class FlickrImages(SearchEngine):
             if 'url' in image_json:
                 result.append(image_json)
 
+            logging.info("FLICKR - Progress: {}%".format(int(len(result) / MAX_IMAGES_PER_REQUEST * 100)))
             self.transport_core.click_button_by_class("navigate-next")
+            count += 1
 
         return result
 
@@ -65,7 +68,9 @@ class FlickrImages(SearchEngine):
 
         image_json = {}
 
-        if len(self.transport_core.get_elements_html_by_class("more-info")) == 0:
+        #if len(self.transport_core.get_elements_html_by_class("more-info")) == 0:
+        if len(self.transport_core.get_elements_html_by_class("follow-view")) > 0:
+
             main_photo = BeautifulSoup(self.transport_core.get_elements_html_by_class("main-photo", False)[0], 'html.parser').find()
             image_json['url'] = self._prepend_http_protocol(main_photo["src"], is_ssl=True)
 
@@ -79,6 +84,7 @@ class FlickrImages(SearchEngine):
 
             image_json['desc'] = "{};{};{}".format(date_taken, ";".join(tag_description), search_words)
             image_json['source'] = "flickr"
+
         # ELSE: We skip this iteration because it is spam
 
         return image_json

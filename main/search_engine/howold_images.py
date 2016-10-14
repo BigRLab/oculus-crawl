@@ -57,7 +57,7 @@ class HowOldImages(SearchEngine):
     def _build_json_for(self, image_tag, search_words):
         url = image_tag['src']
         image_size = self._get_url_size(url)
-        print("image size: ", image_size)
+        #print("image size: ", image_size)
         return {'url': image_tag['src'], 'width': image_size[0], 'height': image_size[1], 'desc': search_words,
                 'source': 'howold'}
 

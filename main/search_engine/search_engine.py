@@ -10,7 +10,9 @@ __author__ = "Ivan de Paz Centeno"
 class SearchEngine(object):
 
     def __init__(self):
+        print("initializing")
         self.transport_core = WebCore()  # It is the preferable and the default transport core.
+        print("initialized")
 
     def retrieve(self, search_request):
         """

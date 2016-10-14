@@ -24,6 +24,7 @@ class GoogleImages(SearchEngine):
         :return:
         """
         # This way we cache the transport core.
+
         if not self.transport_core or search_request.get_transport_core_proto() != self.transport_core.__class__:
             self.transport_core = search_request.get_transport_core_proto()()
             logging.info("Transport core created from proto.")
@@ -64,7 +65,7 @@ class GoogleImages(SearchEngine):
 
         while previous_percent < current_percent:
             previous_percent = current_percent
-            self.transport_core.scroll_to_bottom()
+            #self.transport_core.scroll_to_bottom()
             elements = self.transport_core.get_elements_html_by_class("rg_meta")
             current_percent = len(elements)
 

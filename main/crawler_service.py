@@ -11,7 +11,7 @@ __author__ = "Ivan de Paz Centeno"
 
 
 # Number of elements that the service is going to keep at least in the queue, all the time.
-QUEUE_MIN_BUFFER = 2
+QUEUE_MIN_BUFFER = 5
 
 
 class CrawlerService(Service, RequestPool):

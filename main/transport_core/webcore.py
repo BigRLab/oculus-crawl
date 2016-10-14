@@ -48,8 +48,15 @@ class WebCore(object):
             attribute = 'outerHTML'
 
         logging.debug("Getting elements by class {}".format(class_name))
-        elements_by_class = self.virtual_browser.find_elements_by_class_name(class_name)
-        logging.debug("Retrieved {} elements of class {}".format(len(elements_by_class), class_name))
+
+        elements_by_class =[]
+
+        try:
+            elements_by_class = self.virtual_browser.find_elements_by_class_name(class_name)
+            logging.debug("Retrieved {} elements of class {}".format(len(elements_by_class), class_name))
+        except Exception as ex:
+            logging.debug("Error while retrieving the elements by class {}: {}".format(len(elements_by_class),
+                                                                                      class_name))
 
         result = [element.get_attribute(attribute) for element in elements_by_class]
         return result
@@ -89,7 +96,8 @@ class WebCore(object):
 
     def click_button_by_class(self, param):
         button = self.virtual_browser.find_element_by_class_name(param)
-        button.click()
+        if button:
+            button.click()
 
     def wait_for_elements_from_class(self, class_name):
         sleep(0.5)

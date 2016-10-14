@@ -52,7 +52,7 @@ class GenericDataset(Dataset):
         [data_fetcher.fetch_requests(result_set) for result_set in result_sets]
 
         while wait_for_finish and data_fetcher.get_percent_done() < 100 and len(result_sets) > 0:
-            logging.info("Progress: {}".format(data_fetcher.get_percent_done()))
+            logging.info("Progress: {}%".format(data_fetcher.get_percent_done()))
 
             sleep(1)
 
@@ -88,7 +88,7 @@ class GenericDataset(Dataset):
                     os.makedirs(directory)
 
                 with open(uri, "w") as file:
-                    json.dump(self.metadata_content, file)
+                    json.dump(self.metadata_content, file, indent=4, sort_keys=True)
 
                 logging.info("Dataset metadata saved to file {}".format(uri))
         except Exception as ex:

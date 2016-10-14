@@ -151,7 +151,7 @@ class SearchSession(Service, SocketInterface):
 
         try:
             with open(filename, 'w') as outfile:
-                json.dump(serial, outfile)
+                json.dump(serial, outfile, indent=4, sort_keys=True)
 
             result = True
             logging.info("Session file saved in {}".format(filename))
