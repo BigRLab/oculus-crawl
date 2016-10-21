@@ -32,6 +32,7 @@ def process(queue_element):
     # This way we cache the search_engine between requests in the same thread.
     if not search_engine or search_engine.__class__ != search_engine_proto:
         search_engine = search_engine_proto()
+
     retrieved_result = search_engine.retrieve(search_request)
 
     return [search_request, retrieved_result]

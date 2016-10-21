@@ -19,10 +19,9 @@ class GenericDataset(Dataset):
         if not root_folder:
             root_folder = "/tmp/{}_dataset/".format(name)
 
-        self.name = name
         metadata_file = os.path.join(root_folder, DEFAULT_METADATA_FILE_NAME)
 
-        Dataset.__init__(self, root_folder, metadata_file, "Generic dataset")
+        Dataset.__init__(self, root_folder, metadata_file, "Generic dataset", name)
 
         self.search_session = search_session
         self.data_fetcher = DataFetcher(self.root_folder)
@@ -56,8 +55,6 @@ class GenericDataset(Dataset):
 
             sleep(1)
 
-        logging.info("Data fetched.")
-
     def get_percent_fetched(self):
         return self.data_fetcher.get_percent_done()
 
@@ -78,7 +75,7 @@ class GenericDataset(Dataset):
                 'data': results_json
             }
 
-            logging.info("Metadata built successfully: {}".format(self.metadata_content))
+            logging.info("Metadata built successfully.")
 
             if save_to_file:
                 uri = self.metadata_file

@@ -9,11 +9,12 @@ import os
 
 class Dataset(object):
 
-    def __init__(self, root_folder, metadata_file, description):
+    def __init__(self, root_folder, metadata_file, description, name):
         self.root_folder = root_folder
         self.metadata_file = metadata_file
         self.description = description
         self.default_extension = '.jpg'
+        self.name = name
         self.metadata_content = []
         self.routes = []
 
@@ -41,3 +42,6 @@ class Dataset(object):
 
     def get_metadata_content(self):
         return self.metadata_content
+
+    def get_name(self):
+        return self.name

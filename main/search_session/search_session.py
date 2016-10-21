@@ -155,9 +155,9 @@ class SearchSession(Service, SocketInterface):
 
             result = True
             logging.info("Session file saved in {}".format(filename))
-        except:
+        except Exception as ex:
             result = False
-            logging.info("Could not save the session")
+            logging.info("Could not save the session: {}".format(ex))
 
         return result
 

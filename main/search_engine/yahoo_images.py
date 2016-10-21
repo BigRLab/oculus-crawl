@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 
 __author__ = "Ivan de Paz Centeno"
 
-MAX_IMAGES_PER_REQUEST = 740
+MAX_IMAGES_PER_REQUEST = 700
 MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD = 3
 
 
@@ -47,6 +47,9 @@ class YahooImages(SearchEngine):
 
         # Since yahoo builds the url dynamically per client request, we need to pass through their ring.
         # We fill the search input box
+
+        self.transport_core.wait_for_elements_from_class("ygbt")
+
         text = urllib.parse.quote_plus(search_words)
         self.transport_core.send_text_to_input_by_id("yschsp", text)
 
@@ -54,6 +57,7 @@ class YahooImages(SearchEngine):
         self.transport_core.click_button_by_class("ygbt")
 
         if 'face' in search_options:
+            self.transport_core.wait_for_elements_from_class("portrait")
             # We enable the portrait option if needed.
             self.transport_core.click_button_by_class("portrait")
 
@@ -91,13 +95,20 @@ class YahooImages(SearchEngine):
 
                 if previous_percent == current_percent:
                     no_update_count +=1
+                    self.transport_core.wait_for_elements_from_class("more-res")
                     self.transport_core.click_button_by_class("more-res")
                 else:
                     no_update_count = 0
 
                 previous_percent = current_percent
                 self.transport_core.scroll_to_bottom()
-                elements = self.transport_core.get_elements_html_by_class("ld ")
+
+                try:
+                    self.transport_core.wait_for_elements_from_class("ld")
+                except Exception as ex:
+                    pass
+
+                elements = self.transport_core.get_elements_html_by_class("ld")
                 current_percent = len(elements)
             except Exception as ex:
                 logging.info("Error: {}".format(str(ex)))

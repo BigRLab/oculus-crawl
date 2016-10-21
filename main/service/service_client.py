@@ -17,6 +17,12 @@ class ServiceClient(object):
         self._connect()
         self.lock = Lock()
 
+    def get_host(self):
+        return self.host
+
+    def get_port(self):
+        return self.port
+
     def _connect(self):
         self.worker = self.context.socket(zmq.DEALER)
         self.worker.setsockopt_string(zmq.IDENTITY, str(os.getpid()))

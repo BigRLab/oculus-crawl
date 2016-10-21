@@ -20,20 +20,22 @@ class WebCore(object):
     """
 
     def __init__(self, gui=False, window_size=(1300, 4000)):
-        self.gui = gui
-        profile = webdriver.FirefoxProfile()
-        profile.set_preference("browser.cache.disk.enable", False)
-        profile.set_preference("browser.cache.memory.enable", False)
-        profile.set_preference("browser.cache.offline.enable", False)
-        profile.set_preference("network.http.use-cache", False)
+        try:
+            self.gui = gui
+            profile = webdriver.FirefoxProfile()
+            profile.set_preference("browser.cache.disk.enable", False)
+            profile.set_preference("browser.cache.memory.enable", False)
+            profile.set_preference("browser.cache.offline.enable", False)
+            profile.set_preference("network.http.use-cache", False)
 
-        if not gui:
-            self.virtual_browser_display = Display(visible=0, size=(800, 600))
-            self.virtual_browser_display.start()
+            if not gui:
+                self.virtual_browser_display = Display(visible=0, size=(800, 600))
+                self.virtual_browser_display.start()
 
-        self.virtual_browser = Firefox(profile)
-        self.virtual_browser.set_window_size(*window_size)
-
+            self.virtual_browser = Firefox(profile)
+            self.virtual_browser.set_window_size(*window_size)
+        except Exception as ex:
+            logging.info("Error: {}".format(ex))
         #self.virtual_browser.set_window_position(-1000, -1000)
 
     def get(self, url):
@@ -95,7 +97,12 @@ class WebCore(object):
         input_box.send_keys(text)
 
     def click_button_by_class(self, param):
-        button = self.virtual_browser.find_element_by_class_name(param)
+        try:
+            button = self.virtual_browser.find_element_by_class_name(param)
+        except Exception as ex:
+            logging.info("Error: {}".format(ex))
+            button= None
+
         if button:
             button.click()
 

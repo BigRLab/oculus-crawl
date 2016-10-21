@@ -4,9 +4,18 @@ from threading import Thread, Lock
 
 __author__ = 'Iván de Paz Centeno'
 
-
+# You can define more service status flags:
 SERVICE_RUNNING = 0
+# ----
+# All the flags behind 0 are considered as service running.
+# Example:
+# SERVICE_FETCHING_DATA = -1
+
 SERVICE_STOPPED = 1
+# ----
+# All the flags above 1 are considered as service stopped.
+# Example:
+# SERVICE_CRASH = 2
 
 
 class Service(object):
@@ -71,7 +80,7 @@ class Service(object):
         Starts the service in background.
 
         """
-        if self.get_status() == SERVICE_RUNNING:
+        if self.get_status() <= SERVICE_RUNNING:
             return
 
         self.__set_stop_flag__(False)
@@ -87,7 +96,7 @@ class Service(object):
         finish or not.
         """
 
-        if self.get_status() == SERVICE_STOPPED or self.__get_stop_flag__():
+        if self.get_status() >= SERVICE_STOPPED or self.__get_stop_flag__():
             return
 
         self.__set_stop_flag__(True)
