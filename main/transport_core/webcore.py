@@ -11,7 +11,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from time import sleep
+from time import sleep, time
+
+TIMEOUT = 5
 
 
 class WebCore(object):
@@ -19,7 +21,7 @@ class WebCore(object):
     Represents the transport core for the surface web.
     """
 
-    def __init__(self, gui=False, window_size=(1300, 4000)):
+    def __init__(self, gui=True, window_size=(1280, 1000)):
         try:
             self.gui = gui
             profile = webdriver.FirefoxProfile()
@@ -61,6 +63,7 @@ class WebCore(object):
                                                                                       class_name))
 
         result = [element.get_attribute(attribute) for element in elements_by_class]
+        print("[WEBCORE] result len is {}".format(len(result)))
         return result
 
     def get_elements_html_by_tag(self, tag_name, innerHTML=True):
@@ -108,9 +111,19 @@ class WebCore(object):
 
     def wait_for_elements_from_class(self, class_name):
         sleep(0.5)
-        WebDriverWait(self.virtual_browser, 5).until(EC.presence_of_all_elements_located((By.CLASS_NAME, class_name)))
+        WebDriverWait(self.virtual_browser, 5).until(EC.presence_of_element_located((By.CLASS_NAME, class_name)))
 
+    def manual_wait_for_element_from_class(self, class_name):
+        """
+        Waits for the element by manually polling the amoung of elements of the given class in the DOM, for a timeout
+        of 5 seconds.
+        :param class_name:
+        :return:
+        """
+        init_time = time()
 
+        while len(self.get_elements_html_by_class(class_name)) == 0 and time() - init_time < TIMEOUT:
+            sleep(1)
 
 # Register the class to enable deserialization.
 TRANSPORT_CORES[str(WebCore)] = WebCore

@@ -2,18 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6283d97d-a2fe-4d40-a451-9266200f060d" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/entry.py" afterPath="$PROJECT_DIR$/entry.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/dataset/dataset.py" afterPath="$PROJECT_DIR$/main/dataset/dataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/dataset/generic_dataset.py" afterPath="$PROJECT_DIR$/main/dataset/generic_dataset.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/search_engine/flickr_images.py" afterPath="$PROJECT_DIR$/main/search_engine/flickr_images.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/search_engine/search_engine.py" afterPath="$PROJECT_DIR$/main/search_engine/search_engine.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/search_engine/yahoo_images.py" afterPath="$PROJECT_DIR$/main/search_engine/yahoo_images.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/search_session/search_session.py" afterPath="$PROJECT_DIR$/main/search_session/search_session.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/service/request_pool.py" afterPath="$PROJECT_DIR$/main/service/request_pool.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/service/service.py" afterPath="$PROJECT_DIR$/main/service/service.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/service/service_client.py" afterPath="$PROJECT_DIR$/main/service/service_client.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/service/socket_interface.py" afterPath="$PROJECT_DIR$/main/service/socket_interface.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/transport_core/webcore.py" afterPath="$PROJECT_DIR$/main/transport_core/webcore.py" />
     </list>
     <ignored path="oculuscrawl.iws" />
@@ -37,9 +27,21 @@
       <file leaf-file-name="entry.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/entry.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-135">
-              <caret line="39" column="40" selection-start-line="39" selection-start-column="40" selection-end-line="39" selection-end-column="40" />
+            <state relative-caret-position="326">
+              <caret line="44" column="13" selection-start-line="44" selection-start-column="13" selection-end-line="44" selection-end-column="13" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="flickr_images.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main/search_engine/flickr_images.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="166">
+              <caret line="86" column="36" selection-start-line="86" selection-start-column="36" selection-end-line="86" selection-end-column="36" />
+              <folding>
+                <element signature="e#46#119#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -47,7 +49,7 @@
       <file leaf-file-name="yahoo_images.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main/search_engine/yahoo_images.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="481">
+            <state relative-caret-position="945">
               <caret line="71" column="0" selection-start-line="71" selection-start-column="0" selection-end-line="71" selection-end-column="0" />
               <folding />
             </state>
@@ -57,23 +59,19 @@
       <file leaf-file-name="webcore.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main/transport_core/webcore.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="20" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="20" />
+            <state relative-caret-position="135">
+              <caret line="115" column="45" selection-start-line="115" selection-start-column="43" selection-end-line="115" selection-end-column="45" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test.html">
+      <file leaf-file-name="geckodriver.log" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/geckodriver.log">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="136" column="30" selection-start-line="136" selection-start-column="30" selection-end-line="136" selection-end-column="30" />
-              <folding>
-                <element signature="n#style#0;n#div#0;n#li#12;n#ul#0;n#div#0;n#div#0;n#div#2;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#form#0;n#div#0;n#div#0;n#div#0;n#div#1;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#1;n#!!top" expanded="true" />
-              </folding>
+            <state relative-caret-position="36826">
+              <caret line="3082" column="0" selection-start-line="3082" selection-start-column="0" selection-end-line="3082" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -120,22 +118,23 @@
         <option value="$PROJECT_DIR$/main/search_session/dataset_factory.py" />
         <option value="$PROJECT_DIR$/main/service/service.py" />
         <option value="$PROJECT_DIR$/main/dataset/dataset.py" />
-        <option value="$PROJECT_DIR$/main/search_engine/flickr_images.py" />
         <option value="$PROJECT_DIR$/main/dataset/generic_dataset.py" />
         <option value="$PROJECT_DIR$/main/search_session/search_session.py" />
         <option value="$PROJECT_DIR$/main/service/request_pool.py" />
         <option value="$PROJECT_DIR$/main/search_engine/search_engine.py" />
         <option value="$PROJECT_DIR$/main/dataset/dataset_builder.py" />
         <option value="$PROJECT_DIR$/test.html" />
-        <option value="$PROJECT_DIR$/main/transport_core/webcore.py" />
         <option value="$PROJECT_DIR$/main/search_engine/yahoo_images.py" />
+        <option value="$PROJECT_DIR$/main/transport_core/webcore.py" />
+        <option value="$PROJECT_DIR$/main/search_engine/flickr_images.py" />
         <option value="$PROJECT_DIR$/entry.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="width" value="1280" />
-    <option name="height" value="993" />
+    <option name="x" value="-1" />
+    <option name="width" value="1282" />
+    <option name="height" value="994" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -162,6 +161,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -286,8 +287,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -479,7 +478,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1280" height="993" extended-state="6" />
+    <frame x="-1" y="0" width="1282" height="994" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24801272" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
@@ -488,7 +487,7 @@
       <window_info id="SonarQube" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4678899" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4678899" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
@@ -520,13 +519,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/main/dataset/generic_dataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1065">
-          <caret line="77" column="36" selection-start-line="77" selection-start-column="36" selection-end-line="77" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/entry.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -539,7 +531,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="13" column="20" selection-start-line="13" selection-start-column="20" selection-end-line="13" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -568,7 +559,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3645">
           <caret line="249" column="38" selection-start-line="249" selection-start-column="38" selection-end-line="249" selection-end-column="38" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -583,7 +573,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1155">
           <caret line="84" column="102" selection-start-line="84" selection-start-column="102" selection-end-line="84" selection-end-column="102" />
-          <folding />
+          <folding>
+            <element signature="e#46#119#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -702,7 +694,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -710,9 +701,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="588">
           <caret line="44" column="70" selection-start-line="44" selection-start-column="70" selection-end-line="44" selection-end-column="70" />
-          <folding>
-            <element signature="e#48#80#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -720,7 +708,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
           <caret line="23" column="24" selection-start-line="23" selection-start-column="24" selection-end-line="23" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -728,7 +715,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="13" column="22" selection-start-line="13" selection-start-column="22" selection-end-line="13" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -736,7 +722,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="645">
           <caret line="69" column="6" selection-start-line="69" selection-start-column="6" selection-end-line="69" selection-end-column="6" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -744,7 +729,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="318">
           <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -752,15 +736,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="675">
           <caret line="46" column="24" selection-start-line="46" selection-start-column="24" selection-end-line="46" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main/search_engine/flickr_images.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -768,7 +743,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="310">
           <caret line="104" column="37" selection-start-line="104" selection-start-column="37" selection-end-line="104" selection-end-column="37" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -776,7 +750,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="136" column="45" selection-start-line="136" selection-start-column="26" selection-end-line="136" selection-end-column="45" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -784,7 +757,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="175">
           <caret line="150" column="0" selection-start-line="150" selection-start-column="0" selection-end-line="150" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -792,7 +764,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
           <caret line="94" column="32" selection-start-line="94" selection-start-column="32" selection-end-line="94" selection-end-column="32" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -808,7 +779,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="250">
           <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -816,7 +786,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="184">
           <caret line="81" column="102" selection-start-line="81" selection-start-column="102" selection-end-line="81" selection-end-column="102" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -824,7 +793,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1260">
           <caret line="71" column="16" selection-start-line="71" selection-start-column="16" selection-end-line="71" selection-end-column="16" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -832,9 +800,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="92" column="26" selection-start-line="92" selection-start-column="26" selection-end-line="92" selection-end-column="26" />
-          <folding>
-            <element signature="e#46#55#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -848,36 +813,50 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
+        <state relative-caret-position="2040">
           <caret line="136" column="30" selection-start-line="136" selection-start-column="30" selection-end-line="136" selection-end-column="30" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#li#12;n#ul#0;n#div#0;n#div#0;n#div#2;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#form#0;n#div#0;n#div#0;n#div#0;n#div#1;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#1;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main/transport_core/webcore.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="20" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="20" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main/search_engine/yahoo_images.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="481">
+        <state relative-caret-position="945">
           <caret line="71" column="0" selection-start-line="71" selection-start-column="0" selection-end-line="71" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/geckodriver.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36826">
+          <caret line="3082" column="0" selection-start-line="3082" selection-start-column="0" selection-end-line="3082" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/transport_core/webcore.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="115" column="45" selection-start-line="115" selection-start-column="43" selection-end-line="115" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/search_engine/flickr_images.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="166">
+          <caret line="86" column="36" selection-start-line="86" selection-start-column="36" selection-end-line="86" selection-end-column="36" />
+          <folding>
+            <element signature="e#46#119#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/entry.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-135">
-          <caret line="39" column="40" selection-start-line="39" selection-start-column="40" selection-end-line="39" selection-end-column="40" />
+        <state relative-caret-position="326">
+          <caret line="44" column="13" selection-start-line="44" selection-start-column="13" selection-end-line="44" selection-end-column="13" />
           <folding />
         </state>
       </provider>

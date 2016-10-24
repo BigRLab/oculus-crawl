@@ -41,10 +41,10 @@ if os.path.exists("/home/ivan/session_now.ses"):
     search_session.load_session("/home/ivan/session_now.ses")
 else:
     search_session.append_search_requests([
-            #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=HowOldImages),
+            SearchRequest("1 year old girl", {'face': True}, search_engine_proto=HowOldImages),
             #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=GoogleImages),
             #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=YahooImages),
-            SearchRequest("1 year old girl", {'face': True}, search_engine_proto=FlickrImages),
+            #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=FlickrImages),
             #SearchRequest("1 year old girl", {'face': True}, search_engine_proto=BingImages),
     ])
 
