@@ -79,8 +79,12 @@ class RemoteDatasetFactory(ServiceClient):
             new_result = {}
 
             for session_data in result:
-                result = {'name': session_data['name'], 'session': RemoteSearchSession(session_data['host'],
-                                                                                       session_data['port'])}
+
+                # Fix for localhost
+                if session_data['host'] == "0.0.0.0":
+                    session_data['host'] = "localhost"
+
+                result = {session_data['name']: RemoteSearchSession(session_data['host'], session_data['port'])}
 
         else:
             if 'error' in response:
