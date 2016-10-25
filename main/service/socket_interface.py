@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import logging
 from multiprocessing import Lock
 import zmq
 
@@ -9,13 +9,14 @@ __author__ = 'Iván de Paz Centeno'
 
 class SocketInterface(object):
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, zmq_context=None):
 
         self.host = host
         self.port = port
         self.socket = None
         self.lock = Lock()
         self.poll = None
+        self.context = zmq_context
 
     def get_host(self):
         return self.host
@@ -37,8 +38,13 @@ class SocketInterface(object):
 
     def init_socket(self):
 
-        context = zmq.Context()
-        socket = context.socket(zmq.ROUTER)
+        if not self.context:
+            self.context = zmq.Context()
+            logging.debug("Socket context intialized.")
+        else:
+            logging.debug("Socket context injected.")
+
+        socket = self.context.socket(zmq.ROUTER)
         self.__set_socket__(socket)
 
         socket.bind("tcp://{}:{}".format(self.host, self.port))
@@ -46,6 +52,9 @@ class SocketInterface(object):
 
         self.poll = zmq.Poller()
         self.poll.register(socket, zmq.POLLIN)
+
+    def get_context(self):
+        return self.context
 
     def get_new_request(self):
 

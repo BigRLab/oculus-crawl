@@ -63,7 +63,6 @@ class WebCore(object):
                                                                                       class_name))
 
         result = [element.get_attribute(attribute) for element in elements_by_class]
-        print("[WEBCORE] result len is {}".format(len(result)))
         return result
 
     def get_elements_html_by_tag(self, tag_name, innerHTML=True):

@@ -3,6 +3,7 @@
 import logging
 import os
 
+import time
 import zmq
 from multiprocessing import Lock
 
@@ -14,7 +15,6 @@ class ServiceClient(object):
         self.host = host
         self.port = port
         self.context = zmq.Context()
-        self._connect()
         self.lock = Lock()
 
     def get_host(self):
@@ -25,14 +25,17 @@ class ServiceClient(object):
 
     def _connect(self):
         self.worker = self.context.socket(zmq.DEALER)
-        self.worker.setsockopt_string(zmq.IDENTITY, str(os.getpid()))
+        self.worker.setsockopt_string(zmq.IDENTITY, str(time.time()))
         self.worker.connect("tcp://{}:{}".format(self.host, self.port))
+        logging.debug("Connected.")
 
     def _disconnect(self):
+        logging.debug("Disconnected.")
         self.worker.close()
 
     def _send_request(self, formatted_request):
         response = {}
+        abort = False
 
         with self.lock:
             try:
@@ -44,8 +47,11 @@ class ServiceClient(object):
                                                                                                             self.port,
                                                                                                             ex))
                 self._disconnect()
+                abort = True
 
             try:
+                if abort:
+                    raise Exception("Won't wait for a response when the request couldn't be sent.")
                 response = self.worker.recv_json()
                 self._disconnect()
 

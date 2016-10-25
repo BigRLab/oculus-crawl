@@ -5,7 +5,7 @@ import logging
 from time import sleep
 
 from main.dataset.data_fetcher import DataFetcher
-from main.dataset.dataset import Dataset
+from main.dataset.dataset import Dataset, DATASET_TYPES
 import os
 
 __author__ = "Ivan de Paz Centeno"
@@ -93,3 +93,7 @@ class GenericDataset(Dataset):
 
     def __del__(self):
         self.data_fetcher.stop()
+
+
+# Register the class to enable deserialization.
+DATASET_TYPES['generic_dataset'] = GenericDataset

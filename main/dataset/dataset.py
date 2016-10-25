@@ -45,3 +45,6 @@ class Dataset(object):
 
     def get_name(self):
         return self.name
+
+
+DATASET_TYPES = {}

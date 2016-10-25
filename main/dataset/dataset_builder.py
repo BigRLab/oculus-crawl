@@ -23,6 +23,7 @@ SERVICE_CREATED_DATASET = 2
 
 DEFAULT_WAIT_TIME_SECONDS = 5  # time before starting to fetch data
 
+
 def get_status_name(status_code):
     result = "UNKNOWN"
 
@@ -41,8 +42,21 @@ def get_status_name(status_code):
 
 
 class DatasetBuilder(Service):
+    """
+    Wraps a session to build a dataset with the specified name.
+    The dataset builder will download all the crawled content for the given session (remote or not) and
+    then build a .zip file that after that is published in a route (which can be a web server homedir).
 
-    def __init__(self, search_session, name, autostart=True, dataset_type=GenericDataset):
+    It is a service, meaning that it can be started in background. The progress of the build process can be retrieved
+    with the get_percent_done() method. A 100 percent indicates that the dataset is successfully built, but it may not
+    be packaged or published yet. In order to ensure that the process has finished, check the status of the service
+    in order to match SERVICE_CREATED_DATASET.
+
+    This service does not need to be stopped manually since it ends the background process whenever it finishes, unless
+    the process must be finished beforehand.
+    """
+    def __init__(self, search_session, name, autostart=True, dataset_type=GenericDataset,
+                 default_dataset_dir="/tmp/", publish_dir="/var/www/datasets/", autoclose_search_session_on_exit=False):
         Service.__init__(self)
         self.search_session = search_session
         self.dataset = dataset_type(name, self.search_session, "{}".format(os.path.join(DEFAULT_DATASET_DIR, name)))
@@ -50,9 +64,16 @@ class DatasetBuilder(Service):
         self.percent_crawled = 0
         self.percent_fetched = 0
         self.lock = Lock()
+        self.autoclose_search_session_on_exit = autoclose_search_session_on_exit
 
         if autostart:
             self.start()
+
+    def get_dataset_name(self):
+        return self.dataset.get_name()
+
+    def get_search_session(self):
+        return self.search_session
 
     def __internal_thread__(self):
         Service.__internal_thread__(self)
@@ -62,6 +83,11 @@ class DatasetBuilder(Service):
         percent_fetched = 0
         previous_status = self.get_status()
         start_time = time.time()
+
+        while not self.__get_stop_flag__() and self.search_session.size() == 0 and self.search_session.get_completion_progress() == 0:
+            time.sleep(1)
+
+        #print("Stop flag: {}".format(self.__get_stop_flag__()))
 
         while not self.__get_stop_flag__() and (percent_crawled < 100 or percent_fetched < 100):
 
@@ -85,21 +111,29 @@ class DatasetBuilder(Service):
                 self.percent_crawled = percent_crawled
                 self.percent_fetched = percent_fetched
 
-        self.dataset.build_metadata()
-        self.search_session.save_session(os.path.join(self.dataset.get_root_folder(), "search_session.ses"))
+        if not self.__get_stop_flag__():
+            self.dataset.build_metadata()
+            self.search_session.save_session(os.path.join(self.dataset.get_root_folder(), "search_session.ses"))
 
-        self.__set_status__(SERVICE_COMPRESSING_DATA)
-        self._make_archive()
-        filename = "{}.zip".format(self.dataset.get_name())
+            self.__set_status__(SERVICE_COMPRESSING_DATA)
+            self._make_archive()
+            filename = "{}.zip".format(self.dataset.get_name())
 
-        move("./{}".format(filename), os.path.join(PUBLISH_DIR, filename))
-        rmtree(self.dataset.get_root_folder())
-        self.__set_status__(SERVICE_CREATED_DATASET)
+            move("./{}".format(filename), os.path.join(PUBLISH_DIR, filename))
+            rmtree(self.dataset.get_root_folder())
+            self.__set_status__(SERVICE_CREATED_DATASET)
 
         del self.dataset
 
+        if self.autoclose_search_session_on_exit:
+            self.search_session.stop()
+
     def get_percent_done(self):
-        return self.percent_crawled, self.percent_fetched
+        with self.lock:
+            percent_crawled = self.percent_crawled
+            percent_fetched = self.percent_fetched
+
+        return percent_crawled, percent_fetched
 
     def _make_archive(self):
         make_archive(self.dataset.get_name(), 'zip', self.dataset.get_root_folder(), verbose=1)

@@ -6,7 +6,9 @@ from time import sleep
 from main.crawler_service import CrawlerService
 from main.dataset.data_fetcher import DataFetcher
 from main.dataset.dataset_builder import DatasetBuilder, SERVICE_CREATED_DATASET, get_status_name
+from main.dataset.dataset_factory import DatasetFactory
 from main.dataset.generic_dataset import GenericDataset
+from main.dataset.remote_dataset_factory import RemoteDatasetFactory
 from main.search_engine.bing_images import BingImages
 from main.search_engine.flickr_images import FlickrImages
 from main.search_engine.google_images import GoogleImages
@@ -31,6 +33,30 @@ root.addHandler(ch)
 
 __author__ = "Ivan de Paz Centeno"
 
+
+dataset_factory = DatasetFactory()
+remote_dataset_factory = RemoteDatasetFactory("localhost")
+
+
+def test_dataset_factory(message_prefix, dataset_factory):
+
+    try:
+        print(message_prefix, dataset_factory.get_dataset_builder_names())
+        print(message_prefix, dataset_factory.create_dataset("probando"))
+        print(message_prefix, dataset_factory.get_dataset_builder_names())
+        print(message_prefix, dataset_factory.get_dataset_builder_percent("probando"))
+        print(message_prefix, dataset_factory.get_session_from_dataset_name("probando"))
+        print(message_prefix, dataset_factory.get_dataset_builders_sessions())
+        print(message_prefix, dataset_factory.remove_dataset_builder_by_name("probando"))
+    except Exception as ex:
+        print(ex)
+
+test_dataset_factory("remote", remote_dataset_factory)
+test_dataset_factory("local", dataset_factory)
+
+dataset_factory.stop()
+
+'''
 search_session = SearchSession()
 #search_session_remote = RemoteSearchSession("localhost")
 #search_session_remote.load_session("/tmp/local-search-session.jsn")
@@ -72,3 +98,4 @@ print("\rSTATUS: {}; CRAWLED: {}%; FETCHED: {}%\n".format(
 dataset_builder.stop()
 crawler.stop()
 search_session.stop()
+'''

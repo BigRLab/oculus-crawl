@@ -17,9 +17,9 @@ class SearchSession(Service, SocketInterface):
     and we only need to know where is this session. All the crawled data is going to end up here.
     """
 
-    def __init__(self, host="0.0.0.0", port=24001, autostart=True):
+    def __init__(self, host="0.0.0.0", port=24001, autostart=True, zmq_context=None):
         Service.__init__(self)
-        SocketInterface.__init__(self, host, port)
+        SocketInterface.__init__(self, host, port, zmq_context=zmq_context)
 
         self.start_time = time.time()
         self.search_requests = {}  # hash: request
