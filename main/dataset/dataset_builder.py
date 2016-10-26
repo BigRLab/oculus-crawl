@@ -8,37 +8,14 @@ import time
 
 from main.dataset.generic_dataset import GenericDataset
 from main.service.service import Service
+from main.service.status import SERVICE_CRAWLING_DATA, SERVICE_FETCHING_DATA, SERVICE_COMPRESSING_DATA, \
+    SERVICE_PUBLISHING_DATA, SERVICE_CREATED_DATASET, SERVICE_FILTERING_DATA
 
 __author__ = "Ivan de Paz Centeno"
 
 DEFAULT_DATASET_DIR = "/tmp/"
 PUBLISH_DIR = "/var/www/datasets/"
-
-# Check service.py to know the reason for the number constants.
-SERVICE_CRAWLING_DATA = -1
-SERVICE_FETCHING_DATA = -2
-SERVICE_COMPRESSING_DATA = -3
-SERVICE_PUBLISHING_DATA = -4
-SERVICE_CREATED_DATASET = 2
-
 DEFAULT_WAIT_TIME_SECONDS = 5  # time before starting to fetch data
-
-
-def get_status_name(status_code):
-    result = "UNKNOWN"
-
-    if status_code == SERVICE_CRAWLING_DATA:
-        result = "SERVICE_CRAWLING_DATA"
-    elif status_code == SERVICE_FETCHING_DATA:
-        result = "SERVICE_FETCHING_DATA"
-    elif status_code == SERVICE_COMPRESSING_DATA:
-        result = "SERVICE_COMPRESSING_DATA"
-    elif status_code == SERVICE_PUBLISHING_DATA:
-        result = "SERVICE_PUBLISHING_DATA"
-    elif status_code == SERVICE_CREATED_DATASET:
-        result = "SERVICE_CREATED_DATASET"
-
-    return result
 
 
 class DatasetBuilder(Service):
@@ -56,7 +33,8 @@ class DatasetBuilder(Service):
     the process must be finished beforehand.
     """
     def __init__(self, search_session, name, autostart=True, dataset_type=GenericDataset,
-                 default_dataset_dir="/tmp/", publish_dir="/var/www/datasets/", autoclose_search_session_on_exit=False):
+                 default_dataset_dir="/tmp/", publish_dir="/var/www/datasets/", autoclose_search_session_on_exit=False,
+                 on_finished=None):
         Service.__init__(self)
         self.search_session = search_session
         self.dataset = dataset_type(name, self.search_session, "{}".format(os.path.join(DEFAULT_DATASET_DIR, name)))
@@ -65,12 +43,14 @@ class DatasetBuilder(Service):
         self.percent_fetched = 0
         self.lock = Lock()
         self.autoclose_search_session_on_exit = autoclose_search_session_on_exit
+        self.on_finished = on_finished
+        self.name = name
 
         if autostart:
             self.start()
 
     def get_dataset_name(self):
-        return self.dataset.get_name()
+        return self.name
 
     def get_search_session(self):
         return self.search_session
@@ -115,11 +95,21 @@ class DatasetBuilder(Service):
             self.dataset.build_metadata()
             self.search_session.save_session(os.path.join(self.dataset.get_root_folder(), "search_session.ses"))
 
+            self.__set_status__(SERVICE_FILTERING_DATA)
+            # TODO: Invoke a filter for the data at this stage (if wanted)
+            # It may be a good a idea because it hasn't been packaged yet, however it may increase the load
+            # of the machine.
+            # The dataset content's are stored in self.dataset
+            # The dataset folder is self.dataset.get_root_folder()
+            # The metadata ground truth is located in self.dataset.get_metadata_file()
+
             self.__set_status__(SERVICE_COMPRESSING_DATA)
             self._make_archive()
             filename = "{}.zip".format(self.dataset.get_name())
 
+            self.__set_status__(SERVICE_PUBLISHING_DATA)
             move("./{}".format(filename), os.path.join(PUBLISH_DIR, filename))
+
             rmtree(self.dataset.get_root_folder())
             self.__set_status__(SERVICE_CREATED_DATASET)
 
@@ -127,6 +117,9 @@ class DatasetBuilder(Service):
 
         if self.autoclose_search_session_on_exit:
             self.search_session.stop()
+
+        if self.on_finished:
+            self.on_finished(self.get_dataset_name())
 
     def get_percent_done(self):
         with self.lock:

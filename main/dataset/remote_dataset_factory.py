@@ -6,6 +6,8 @@ from main.dataset.dataset import DATASET_TYPES
 from main.dataset.generic_dataset import GenericDataset
 from main.search_session.remote_search_session import RemoteSearchSession
 from main.service.service_client import ServiceClient
+from main.service.status import SERVICE_STATUS_UNKNOWN
+from main.service.status import get_status_by_name
 
 __author__ = "Ivan de Paz Centeno"
 
@@ -17,11 +19,9 @@ class RemoteDatasetFactory(ServiceClient):
 
     def get_dataset_builder_percent(self, name):
         """
-        Adds a batch of search requests to the session.
-        If a crawler is working over this session at the moment that elements are appended, the crawler will
-        process them on the fly.
-        :param search_requests:
-        :return:
+        Retrieves the dataset build percent for the specified dataset name.
+        :param name: name of the dataset to request the build percent .
+        :return: a dictionary holding the status and the percentage of the status.
         """
         response = self._send_request({
             'action': 'get_dataset_progress_by_name',
@@ -37,7 +37,7 @@ class RemoteDatasetFactory(ServiceClient):
                 error = "No response provided"
 
             logging.error("Could not retrieve the dataset builder progress: {}".format(error))
-            result = -1
+            result = {'status': get_status_by_name(SERVICE_STATUS_UNKNOWN)}
 
         return result
 

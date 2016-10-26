@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import logging
-import time
 
 from main.dataset.dataset import DATASET_TYPES
 from main.dataset.dataset_builder import DatasetBuilder
 from main.dataset.generic_dataset import GenericDataset
-from main.search_session.remote_search_session import RemoteSearchSession
 from main.search_session.search_session import SearchSession
 from main.service.service import Service, SERVICE_STOPPED
 from main.service.socket_interface import SocketInterface
+from main.service.status import get_status_name, SERVICE_CRAWLING_DATA, SERVICE_FETCHING_DATA, SERVICE_FILTERING_DATA, \
+    SERVICE_RUNNING
 
 __author__ = "Ivan de Paz Centeno"
 
@@ -67,17 +67,40 @@ class DatasetFactory(Service, SocketInterface):
 
     def get_dataset_builder_percent(self, name):
         """
-        Returns the percent done for the specified dataset name.
+        Returns the percent done for the specified dataset name in a dict.
+        {
+         'percent': percent
+         'status': "status_text"
+        }
+
+        Check the available status for the dataset builder in service/status.py
+
         :param name: dataset name whose percent is desired.
         :return: percent of completion of the dataset
         """
+
         with self.lock:
             if name in self.datasets_builders_working:
-                percent_done = self.datasets_builders_working[name].get_percent_done()
-            else:
-                percent_done = -1
+                percent_done_set = [*self.datasets_builders_working[name].get_percent_done()]
+                status = self.datasets_builders_working[name].get_status()
 
-        return percent_done
+                percent_status_map = {
+                    SERVICE_RUNNING: 0,
+                    SERVICE_CRAWLING_DATA: percent_done_set[0],
+                    SERVICE_FETCHING_DATA: percent_done_set[1],
+                    #SERVICE_FILTERING_DATA: percent_done[2]
+                }
+
+                if status in percent_status_map:
+                    percent_done = percent_status_map[status]
+                else:
+                    percent_done = -1
+
+                result = {'percent': percent_done, 'status': get_status_name(status)}
+            else:
+                result = {'status': 'UNKNOWN'}
+
+        return result
 
     def get_dataset_builder_names(self):
         """
@@ -128,12 +151,16 @@ class DatasetFactory(Service, SocketInterface):
         else:
             new_port = port
 
-        if new_port:
+        with self.lock:
+            name_taken = name in self.datasets_builders_working
+
+        if new_port and not name_taken:
             with self.lock:
                 search_session = SearchSession(host=host, port=new_port, zmq_context=self.get_context())
                 self.used_ports.append(new_port)
                 dataset_builder = DatasetBuilder(search_session, name, autostart=True, dataset_type=dataset_type,
-                                                 autoclose_search_session_on_exit=True)
+                                                 autoclose_search_session_on_exit=True,
+                                                 on_finished=self._on_builder_finished)
                 logging.info("Started dataset builder for {}".format(name))
                 self.datasets_builders_working[name] = dataset_builder
 
@@ -208,15 +235,17 @@ class DatasetFactory(Service, SocketInterface):
                     port = None
 
                 dataset_type = DATASET_TYPES[request['dataset_type']]
+
             else:
                 dataset_type = GenericDataset
 
-
             logging.info("Creating dataset with name {}".format(request['name']))
-            self.create_dataset(request['name'], host=host, port=port, dataset_type=dataset_type)
-            logging.info("Dataset with name {} initialized".format(request['name']))
-
-            result = {'result': 'Done'}
+            if self.create_dataset(request['name'], host=host, port=port, dataset_type=dataset_type):
+                logging.info("Dataset with name {} initialized".format(request['name']))
+                result = {'result': 'Done'}
+            else:
+                logging.error("Dataset name {} is already taken".format(request['name']))
+                result = {'error': 'dataset name already taken'}
 
         except Exception as ex:
 
@@ -316,7 +345,7 @@ class DatasetFactory(Service, SocketInterface):
             with self.lock:
 
                 if request['name'] not in self.datasets_builders_working:
-                    raise Exception("Name is not in the available list.")
+                    raise Exception("Name is not in the working datasets builders list.")
 
             percent_done = self.get_dataset_builder_percent(request['name'])
 
@@ -343,3 +372,22 @@ class DatasetFactory(Service, SocketInterface):
                                  for name, dataset_builder in self.datasets_builders_working.items()]}
 
         SocketInterface.send_response(self, identity, result)
+
+    def _on_builder_finished(self, name):
+        """
+        This method is called whenever a dataset builder finished its job.
+        We need to remove the dataset builder from the working list since its session is
+        freed, and can make freezes on crawlers when they try to find the progress of the available sessions.
+
+        :param name: name of the dataset builder to remove from the list.
+        :return:
+        """
+        dataset_session = self.get_session_from_dataset_name(name)
+        self.remove_dataset_builder_by_name(name)
+
+        # Lets free the port from the used ports, as it is released from now on
+        with self.lock:
+            self.used_ports.remove(dataset_session.get_port())
+
+        if dataset_session.get_status() != SERVICE_STOPPED:
+            dataset_session.stop()

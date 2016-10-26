@@ -2,20 +2,9 @@
 # -*- coding: utf-8 -*-
 from threading import Thread, Lock
 
+from main.service.status import SERVICE_STOPPED, SERVICE_RUNNING
+
 __author__ = 'Iván de Paz Centeno'
-
-# You can define more service status flags:
-SERVICE_RUNNING = 0
-# ----
-# All the flags behind 0 are considered as service running.
-# Example:
-# SERVICE_FETCHING_DATA = -1
-
-SERVICE_STOPPED = 1
-# ----
-# All the flags above 1 are considered as service stopped.
-# Example:
-# SERVICE_CRASH = 2
 
 
 class Service(object):
