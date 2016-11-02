@@ -6,7 +6,9 @@ import sys
 from time import sleep, time
 
 from main.dataset.remote_dataset_factory import RemoteDatasetFactory
+from main.search_engine.flickr_images import FlickrImages
 from main.search_engine.google_images import GoogleImages
+from main.search_engine.yahoo_images import YahooImages
 from main.search_session.search_request import SearchRequest
 from main.service.status import SERVICE_CREATED_DATASET, get_status_name, SERVICE_STATUS_UNKNOWN, SERVICE_RUNNING, \
     get_status_by_name
@@ -54,7 +56,7 @@ try:
         raise Exception("Dataset request could not be created on the factory.")
 
     remote_session = remote_dataset_factory.get_session_from_dataset_name(dataset_name)
-    remote_session.append_search_requests([SearchRequest("1 yo boy", {'face': True}, GoogleImages)])
+    remote_session.append_search_requests([SearchRequest("1 yo old", {'face': True}, YahooImages)])
 
     status = SERVICE_STATUS_UNKNOWN
     previous_status = SERVICE_STATUS_UNKNOWN

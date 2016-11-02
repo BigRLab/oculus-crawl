@@ -12,6 +12,9 @@ QUEUE_MIN_BUFFER = 100
 
 
 class DataFetcher(FetchPool, Service):
+    """
+    Service for fetching URLs data distributed among a pool of processes.
+    """
     def __init__(self, to_folder):
         FetchPool.__init__(self, pool_limit=20)
         Service.__init__(self)

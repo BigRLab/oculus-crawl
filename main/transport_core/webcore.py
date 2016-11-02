@@ -84,7 +84,11 @@ class WebCore(object):
                 self.virtual_browser.find_elements_by_id(id)]
 
     def scroll_to_bottom(self):
-        self.virtual_browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        try:
+            self.virtual_browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        except:
+            logging.info("Could not scroll to the bottom")
+            pass
         logging.info("Scrolling to the bottom")
         sleep(0.2)
 

@@ -11,11 +11,20 @@ __author__ = 'Iván de Paz Centeno'
 
 
 class ServiceClient(object):
-    def __init__(self, host, port):
+
+    def __init__(self, host, port, zmq_context=None):
         self.host = host
         self.port = port
-        self.context = zmq.Context()
+        self.zmq_context = zmq_context
+
+        self.random_ports = range(30000, 30020)
+
+        if not zmq_context:
+            self.context = zmq.Context()
+
         self.lock = Lock()
+
+        self.uri_host = "tcp://{}:{}".format(self.host, self.port)
 
     def get_host(self):
         return self.host
@@ -25,12 +34,14 @@ class ServiceClient(object):
 
     def _connect(self):
         self.worker = self.context.socket(zmq.DEALER)
-        self.worker.setsockopt_string(zmq.IDENTITY, str(time.time()))
-        self.worker.connect("tcp://{}:{}".format(self.host, self.port))
+        self.worker.setsockopt_string(zmq.IDENTITY, str(os.getpid()) + str(time.time()))
+        self.worker.RCVTIMEO = 10000
+        self.worker.connect(self.uri_host)
         logging.debug("Connected.")
 
     def _disconnect(self):
         logging.debug("Disconnected.")
+        self.worker.disconnect(self.uri_host)
         self.worker.close()
 
     def _send_request(self, formatted_request):

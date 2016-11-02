@@ -45,7 +45,7 @@ def process(queue_element):
 
     try:
         req = Request(download_url, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36'})
-        source = urlopen(req)
+        source = urlopen(req, timeout=15)
         data = source.read()
         headers = source.info()
 

@@ -7,6 +7,7 @@ import sys
 
 from main.crawler_service import CrawlerService
 from main.dataset.remote_dataset_factory import RemoteDatasetFactory
+from main.search_engine import yahoo_images, bing_images, flickr_images, google_images, howold_images
 import random
 
 __author__ = "Ivan de Paz Centeno"
@@ -22,7 +23,7 @@ root.addHandler(ch)
 
 FINISH = False
 CRAWLER_PROCESSES = 10
-WAIT_TIME_BETWEEN_TRIES = 10    # seconds
+WAIT_TIME_BETWEEN_TRIES = 1    # seconds
 
 remote_dataset_factory = RemoteDatasetFactory("localhost")
 
@@ -55,7 +56,7 @@ while not FINISH:
         selected_session.wait_for_finish()
 
         crawler.stop()
-        logging.info("Finished crawling session session ({}:{}) from "
+        logging.info("Finished crawling session ({}:{}) from "
                      "dataset \"{}\" to crawl".format(selected_session.get_host(), selected_session.get_port(), name))
 
     except Exception as ex:

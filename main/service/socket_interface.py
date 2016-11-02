@@ -18,6 +18,9 @@ class SocketInterface(object):
         self.poll = None
         self.context = zmq_context
 
+    def get_context(self):
+        return self.context
+
     def get_host(self):
         return self.host
 
@@ -47,9 +50,11 @@ class SocketInterface(object):
         socket = self.context.socket(zmq.ROUTER)
         self.__set_socket__(socket)
 
+        socket.RCVTIMEO = 10000
+
         socket.bind("tcp://{}:{}".format(self.host, self.port))
         #print("Running server on {}:{}".format(self.host, self.port))
-
+        logging.info("Socket opened in port {}".format(self.port))
         self.poll = zmq.Poller()
         self.poll.register(socket, zmq.POLLIN)
 
@@ -71,7 +76,7 @@ class SocketInterface(object):
             if sockets:
                 identity = socket.recv().decode()
                 formatted_request = socket.recv_json()
-
+                print(formatted_request)
                 if not ('action' in formatted_request):
 
                     socket.send_string(identity, zmq.SNDMORE)
@@ -92,6 +97,8 @@ class SocketInterface(object):
         socket.send_json(formatted_response)
 
     def terminate(self):
-
+        self.__get_socket__().unbind("tcp://{}:{}".format(self.host, self.port))
+        self.__get_socket__().setsockopt(zmq.LINGER, 0)
         self.__get_socket__().close()
+        logging.info("Socket closed for port {}".format(self.port))
         self.__set_socket__(None)

@@ -385,9 +385,13 @@ class DatasetFactory(Service, SocketInterface):
         dataset_session = self.get_session_from_dataset_name(name)
         self.remove_dataset_builder_by_name(name)
 
+        if dataset_session.get_status() != SERVICE_STOPPED:
+            dataset_session.stop()
+
         # Lets free the port from the used ports, as it is released from now on
+        # TODO: Fix the unclosed sockets problem.
         with self.lock:
             self.used_ports.remove(dataset_session.get_port())
 
-        if dataset_session.get_status() != SERVICE_STOPPED:
-            dataset_session.stop()
+        logging.info("Port freed.")
+

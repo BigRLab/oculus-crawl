@@ -14,8 +14,8 @@ __author__ = "Ivan de Paz Centeno"
 
 class RemoteDatasetFactory(ServiceClient):
 
-    def __init__(self, remote_host, remote_port=24005):
-        ServiceClient.__init__(self, remote_host, remote_port)
+    def __init__(self, remote_host, remote_port=24005, zmq_context=None):
+        ServiceClient.__init__(self, remote_host, remote_port, zmq_context)
 
     def get_dataset_builder_percent(self, name):
         """

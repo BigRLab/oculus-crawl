@@ -17,8 +17,8 @@ class RemoteSearchSession(ServiceClient):
     It acts as a proxy class, allowing the retrieval or appending of new search requests.
     """
 
-    def __init__(self, remote_host, remote_port=24001):
-        ServiceClient.__init__(self, remote_host, remote_port)
+    def __init__(self, remote_host, remote_port=24001, zmq_context=None):
+        ServiceClient.__init__(self, remote_host, remote_port, zmq_context)
 
     def append_search_requests(self, search_requests=None):
         """

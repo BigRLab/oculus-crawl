@@ -50,7 +50,7 @@ class YahooImages(SearchEngine):
 
         self.transport_core.wait_for_elements_from_class("ygbt")
 
-        text = urllib.parse.quote_plus(search_words)
+        text = search_words  #urllib.parse.quote_plus(search_words)
         self.transport_core.send_text_to_input_by_id("yschsp", text)
 
         # Then we click it
