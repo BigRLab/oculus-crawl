@@ -94,23 +94,29 @@ class BingImages(SearchEngine):
             current_percent = len(elements)
 
     def _build_json_for(self, element, search_words):
-        element = element.find("a")
-        #logging.info("Building for element {}".format(element))
 
-        description = element['t1']
-        size = element['t2']
-        width = size.split(" ")[0]
-        height = size.split(" ")[2]
+        try:
+            element = element.find("a")
+            #logging.info("Building for element {}".format(element))
 
-        json_text = element['m']
-        json_data = json.loads(re.sub('([{,])([^{:\s"]*):', lambda m: '{}"{}":'.format(m.group(1), m.group(2)),
-                                      json_text))
+            description = element['t1']
+            size = element['t2']
+            width = size.split(" ")[0]
+            height = size.split(" ")[2]
 
-        result = {'url': self._prepend_http_protocol(json_data['imgurl']),
-                  'width': width,
-                  'height': height,
-                  'desc': description+";"+search_words,
-                  'source': 'bing'}
+            json_text = element['m']
+            json_data = json.loads(re.sub('([{,])([^{:\s"]*):', lambda m: '{}"{}":'.format(m.group(1), m.group(2)),
+                                          json_text))
+
+            result = {'url': self._prepend_http_protocol(json_data['imgurl']),
+                      'width': width,
+                      'height': height,
+                      'desc': description+";"+search_words,
+                      'source': 'bing'}
+
+        except Exception as ex:
+
+            result = {}
         #logging.info("Result: {}".format(result))
 
         return result

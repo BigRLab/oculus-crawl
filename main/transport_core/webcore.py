@@ -21,7 +21,7 @@ class WebCore(object):
     Represents the transport core for the surface web.
     """
 
-    def __init__(self, gui=True, window_size=(1280, 1000)):
+    def __init__(self, gui=False, window_size=(1280, 1000)):
         try:
             self.gui = gui
             profile = webdriver.FirefoxProfile()

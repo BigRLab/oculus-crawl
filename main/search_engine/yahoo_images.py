@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 
 __author__ = "Ivan de Paz Centeno"
 
-MAX_IMAGES_PER_REQUEST = 700
+MAX_IMAGES_PER_REQUEST = 730
 MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD = 3
 
 
@@ -64,13 +64,15 @@ class YahooImages(SearchEngine):
         self._cache_all_page()
 
         logging.info("Get done. Loading elements JSON")
+        elements_holder = self.transport_core.get_elements_html_by_class("ld ", False)
+        logging.info("Retrieved all the elements holders.")
 
         ld_elements = [BeautifulSoup(html_element, 'html.parser').find() for html_element in
-                       self.transport_core.get_elements_html_by_class("ld ", False)]
-
+                       elements_holder]
+        logging.info("Building json...")
         result = [self._build_json_for(element, search_words) for element in ld_elements]
 
-        logging.info("Retrieved {} elements".format(len(result)))
+        logging.info("Retrieved {} elements in JSON format successfully".format(len(result)))
         return result
 
     def _cache_all_page(self):
@@ -116,6 +118,7 @@ class YahooImages(SearchEngine):
 
     def _build_json_for(self, element, search_words):
 
+
         if element.has_attr('data'):
             data = element["data"]
         else:
@@ -128,16 +131,23 @@ class YahooImages(SearchEngine):
                       'desc': json_data['alt']+";"+search_words,
                       'source': 'yahoo'}
         else:
+
             link = element.find("a")
             if link:
-                href = link["href"]
-                parsed_href = urlparse.parse_qs(urlparse.urlparse(href).query)
-                result = {'url': self._prepend_http_protocol(parsed_href['imgurl'][0]), 'width': parsed_href['w'][0],
-                          'height': parsed_href['h'][0], 'desc': parsed_href['name'][0]+";"+search_words,
-                          'source': 'yahoo'}
+                try:
+                    href = link["href"]
+                    parsed_href = urlparse.parse_qs(urlparse.urlparse(href).query)
+                    result = {'url': self._prepend_http_protocol(parsed_href['imgurl'][0]), 'width': parsed_href['w'][0],
+                              'height': parsed_href['h'][0], 'desc': parsed_href['name'][0]+";"+search_words,
+                              'source': 'yahoo'}
+                except Exception as ex:
+                    result = {}
+
             else:
+
                 result = {}
 
+        print("Result is: {}".format(result))
         return result
 
 # Register the class to enable deserialization.

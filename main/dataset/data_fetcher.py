@@ -15,6 +15,7 @@ class DataFetcher(FetchPool, Service):
     """
     Service for fetching URLs data distributed among a pool of processes.
     """
+
     def __init__(self, to_folder):
         FetchPool.__init__(self, pool_limit=20)
         Service.__init__(self)
@@ -51,7 +52,21 @@ class DataFetcher(FetchPool, Service):
         :param request_list: a list of JSON-formatted results retrieved from the search_session-crawled requests.
         :return:
         """
+        request_list = self._discard_invalid_requests(request_list)
         [self.database.append(request['url'], request) for request in request_list]
+
+    @staticmethod
+    def _discard_invalid_requests(request_list):
+        new_request_list = []
+
+        for request in request_list:
+            if 'url' in request and 'width' in request and 'height' in request and 'desc' in request and 'source' in request:
+                new_request_list.append(request)
+
+        discarded_requests = len(request_list) - len(new_request_list)
+
+        print ("Discarded {} requests for being invalid.".format(discarded_requests))
+        return new_request_list
 
     def process_finished(self, wrapped_result):
         self.database.add_result_data(wrapped_result[0], wrapped_result[1], wrapped_result[2])

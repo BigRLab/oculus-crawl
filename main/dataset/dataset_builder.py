@@ -97,7 +97,7 @@ class DatasetBuilder(Service):
 
             self.__set_status__(SERVICE_FILTERING_DATA)
             # TODO: Invoke a filter for the data at this stage (if wanted)
-            # It may be a good a idea because it hasn't been packaged yet, however it may increase the load
+            # It may be a good idea because it hasn't been packaged yet, however it may increase the load
             # of the machine.
             # The dataset content's are stored in self.dataset
             # The dataset folder is self.dataset.get_root_folder()
