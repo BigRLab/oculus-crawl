@@ -93,9 +93,9 @@ class WebCore(object):
         sleep(0.2)
 
     def __del__(self):
-        self.virtual_browser.close()
+        self.virtual_browser.quit()
 
-        if self.gui:
+        if not self.gui:
             self.virtual_browser_display.stop()
 
     def send_text_to_input_by_id(self, param, text):

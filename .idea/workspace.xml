@@ -3,11 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="6283d97d-a2fe-4d40-a451-9266200f060d" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extcli.py" afterPath="$PROJECT_DIR$/extcli.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/dataset/data_fetcher.py" afterPath="$PROJECT_DIR$/main/dataset/data_fetcher.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/dataset/dataset_builder.py" afterPath="$PROJECT_DIR$/main/dataset/dataset_builder.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/search_engine/bing_images.py" afterPath="$PROJECT_DIR$/main/search_engine/bing_images.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/search_engine/yahoo_images.py" afterPath="$PROJECT_DIR$/main/search_engine/yahoo_images.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/transport_core/webcore.py" afterPath="$PROJECT_DIR$/main/transport_core/webcore.py" />
     </list>
     <ignored path="oculuscrawl.iws" />
@@ -38,36 +33,34 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="search_engine.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main/search_engine/search_engine.py">
+      <file leaf-file-name="extcli.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/extcli.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="379">
-              <caret line="58" column="13" selection-start-line="58" selection-start-column="13" selection-end-line="58" selection-end-column="13" />
+            <state relative-caret-position="514">
+              <caret line="118" column="0" selection-start-line="118" selection-start-column="0" selection-end-line="118" selection-end-column="0" />
+              <folding>
+                <element signature="e#46#60#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="celibrityagewiki_images.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main/search_engine/celibrityagewiki_images.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dataset_builder.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main/dataset/dataset_builder.py">
+      <file leaf-file-name="flickr_images.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main/search_engine/flickr_images.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="155">
-              <caret line="104" column="0" selection-start-line="104" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
-              <folding>
-                <element signature="e#46#55#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="extcli.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/extcli.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="104" column="46" selection-start-line="104" selection-start-column="46" selection-end-line="104" selection-end-column="46" />
-              <folding>
-                <element signature="e#46#60#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="855">
+              <caret line="62" column="37" selection-start-line="62" selection-start-column="35" selection-end-line="62" selection-end-column="37" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -114,11 +107,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="webcore.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="webcore.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main/transport_core/webcore.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="20" column="54" selection-start-line="20" selection-start-column="54" selection-end-line="20" selection-end-column="54" />
+            <state relative-caret-position="409">
+              <caret line="117" column="0" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -191,8 +184,9 @@
         <option value="$PROJECT_DIR$/main/dataset/dataset_builder.py" />
         <option value="$PROJECT_DIR$/main/dataset/data_fetcher.py" />
         <option value="$PROJECT_DIR$/main/search_engine/yahoo_images.py" />
-        <option value="$PROJECT_DIR$/extcli.py" />
         <option value="$PROJECT_DIR$/main/search_engine/bing_images.py" />
+        <option value="$PROJECT_DIR$/extcli.py" />
+        <option value="$PROJECT_DIR$/main/search_engine/celibrityagewiki_images.py" />
         <option value="$PROJECT_DIR$/main/transport_core/webcore.py" />
       </list>
     </option>
@@ -290,6 +284,24 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="oculuscrawl" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="oculuscrawl" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="search_engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="Scope" />
@@ -299,15 +311,15 @@
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../CvMlModule" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../googlesearch" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/main/dataset" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/main/search_engine" />
       <recent name="$PROJECT_DIR$/main/service" />
+      <recent name="$PROJECT_DIR$/main/dataset" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/main/dataset" />
     </key>
   </component>
@@ -587,13 +599,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/main/search_engine/google_images.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="55" column="63" selection-start-line="55" selection-start-column="63" selection-end-line="55" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main/search_engine/yahoo_images.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -670,16 +675,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test.html" />
-    <entry file="file://$PROJECT_DIR$/main/search_engine/flickr_images.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="62" column="37" selection-start-line="62" selection-start-column="35" selection-end-line="62" selection-end-column="37" />
-          <folding>
-            <element signature="e#46#119#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main/search_engine/google_images.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -870,7 +865,7 @@
         <state relative-caret-position="155">
           <caret line="104" column="0" selection-start-line="104" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
           <folding>
-            <element signature="e#46#55#0" expanded="true" />
+            <element signature="e#46#55#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -907,14 +902,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main/transport_core/webcore.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="54" selection-start-line="20" selection-start-column="54" selection-end-line="20" selection-end-column="54" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/factory.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
@@ -937,11 +924,35 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/extcli.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="104" column="46" selection-start-line="104" selection-start-column="46" selection-end-line="104" selection-end-column="46" />
+        <state relative-caret-position="514">
+          <caret line="118" column="0" selection-start-line="118" selection-start-column="0" selection-end-line="118" selection-end-column="0" />
           <folding>
             <element signature="e#46#60#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/search_engine/flickr_images.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="855">
+          <caret line="62" column="37" selection-start-line="62" selection-start-column="35" selection-end-line="62" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/search_engine/celibrityagewiki_images.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/transport_core/webcore.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="409">
+          <caret line="117" column="0" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
