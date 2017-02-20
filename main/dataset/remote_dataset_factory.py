@@ -1,21 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import logging
+import requests
 
 from main.dataset.dataset import DATASET_TYPES
 from main.dataset.generic_dataset import GenericDataset
 from main.search_session.remote_search_session import RemoteSearchSession
-from main.service.service_client import ServiceClient
-from main.service.status import SERVICE_STATUS_UNKNOWN
-from main.service.status import get_status_by_name
 
 __author__ = "Ivan de Paz Centeno"
 
 
-class RemoteDatasetFactory(ServiceClient):
+class RemoteDatasetFactory():
+    """
+    Proxies a remote dataset in order to create/manipulate datasets.
+    """
 
-    def __init__(self, remote_host, remote_port=24005, zmq_context=None):
-        ServiceClient.__init__(self, remote_host, remote_port, zmq_context)
+    def __init__(self, backend_url):
+        """
+        Initializer for the proxy.
+        :param backend_url:
+        """
+
+        if backend_url[-1] == "/":
+            backend_url = backend_url[:-1]
+
+        self.backend_url = backend_url
 
     def get_dataset_builder_percent(self, name):
         """
@@ -23,77 +31,33 @@ class RemoteDatasetFactory(ServiceClient):
         :param name: name of the dataset to request the build percent .
         :return: a dictionary holding the status and the percentage of the status.
         """
-        response = self._send_request({
-            'action': 'get_dataset_progress_by_name',
-            'name': name
-        })
+        url = "{}/dataset/{}/progress".format(self.backend_url, name)
 
-        if 'result' in response:
-            result = response['result']
-        else:
-            if 'error' in response:
-                error = response['error']
-            else:
-                error = "No response provided"
+        response = requests.get(url)
 
-            logging.error("Could not retrieve the dataset builder progress: {}".format(error))
-            result = {'status': get_status_by_name(SERVICE_STATUS_UNKNOWN)}
+        if response.status_code != 200:
+            raise Exception("Backend ({}) for session is returning a bad response!".format(url))
 
-        return result
+        return response.json()
 
     def get_dataset_builder_names(self):
         """
         Returns a list of names of the dataset builders in progress.
         :return:
         """
-        response = self._send_request({
-            'action': 'get_dataset_names_list'
-        })
+        url = "{}/dataset/".format(self.backend_url)
+
+        response = requests.get(url)
+
+        if response.status_code != 200:
+            raise Exception("Backend ({}) for session is returning a bad response!".format(url))
+
+        response = response.json()
 
         if 'result' in response:
             result = response['result']
         else:
-            if 'error' in response:
-                error = response['error']
-            else:
-                error = "No response provided"
-
-            logging.error("Could not retrieve the datasets' names: {}".format(error))
-            result = -1
-
-        return result
-
-    def get_dataset_builders_sessions(self):
-        """
-        Returns the list of the session attached to each of the dataset builders in progress.
-        :return:
-        """
-        response = self._send_request({
-            'action': 'get_sessions_from_datasets'
-        })
-
-        if 'result' in response:
-            result = response['result']
-
-            # We translate the serialized sessions into remote sessions
-            new_result = {}
-
-            for session_data in result:
-
-                # Fix for localhost
-                if session_data['host'] == "0.0.0.0":
-                    session_data['host'] = "localhost"
-
-                result = {session_data['name']: RemoteSearchSession(session_data['host'], session_data['port'])}
-
-        else:
-            if 'error' in response:
-                error = response['error']
-            else:
-                error = "No response provided"
-
-            logging.error("Could not retrieve the datasets' sessions: {}".format(error))
-            result = -1
+            raise Exception("Backend sent a malformed response when retrieving the dataset names.")
 
         return result
 
@@ -103,26 +67,8 @@ class RemoteDatasetFactory(ServiceClient):
         :param name: name of the dataset to get the session from.
         :return:
         """
-        response = self._send_request({
-            'action': 'get_session_by_dataset_name',
-            'name': name
-        })
-
-        if 'result' in response:
-            session_data = response['result']
-
-            result = RemoteSearchSession(session_data['host'], session_data['port'])
-
-        else:
-            if 'error' in response:
-                error = response['error']
-            else:
-                error = "No response provided"
-
-            logging.error("Could not retrieve the dataset session from name '{}': {}".format(name, error))
-            result = None
-
-        return result
+        url = "{}/dataset/{}/session".format(self.backend_url, name)
+        return RemoteSearchSession(url)
 
     def remove_dataset_builder_by_name(self, name):
         """
@@ -130,55 +76,29 @@ class RemoteDatasetFactory(ServiceClient):
         :param name: name of the dataset to remove from the list
         :return:
         """
-        response = self._send_request({
-            'action': 'remove_dataset_by_name',
-            'name': name
-        })
+        url = "{}/dataset/{}/".format(self.backend_url, name)
 
-        if 'result' in response:
-            result = response['result'] == 'Done'
-        else:
-            if 'error' in response:
-                error = response['error']
-            else:
-                error = "No response provided"
+        response = requests.delete(url)
 
-            logging.error("Could not remove the dataset: {}".format(error))
-            result = False
+        if response.status_code != 200:
+            raise Exception("Backend ({}) for session is returning a bad response!".format(url))
 
-        return result
-
-    def create_dataset(self, name, host="0.0.0.0", port=None, dataset_type=GenericDataset):
+    def create_dataset(self, name, dataset_type=GenericDataset):
         """
         Creates a new dataset builder and a search_session associated to it.
         The search session is created with the parameters
         By default, the dataset builder is stopped until at least one search request is appended.
 
-        :param host: host for the search session. Crawlers will seek for this session's search requests on this host.
-                    If host is not provided, it will fall back to all the interfaces.
-        :param port: port for the search session. Crawlers will seek for this session's search requests on this port.
-                    If port is not provided, it will fall back to a random free port.
-        :return: the created dataset_builder.
+        :return: True if it was successfully created. False otherwise.
         """
         inv_dataset_types = {v: k for k, v in DATASET_TYPES.items()}
 
-        response = self._send_request({
-            'action': 'create_dataset',
-            'name': name,
-            'host': host,
-            'port': port,
-            'dataset_type': inv_dataset_types[dataset_type]
-        })
+        url = "{}/dataset/".format(self.backend_url)
 
-        if 'result' in response:
-            result = response['result'] == 'Done'
-        else:
-            if 'error' in response:
-                error = response['error']
-            else:
-                error = "No response provided"
+        response = requests.put(url, params={'name': name, 'dataset_type': inv_dataset_types[dataset_type]})
 
-            logging.error("Could not create the dataset: {}".format(error))
-            result = False
+        if response.status_code == 401:
+            raise Exception("Name \"{}\" is already taken.".format(name))
 
-        return result
+        elif response.status_code != 200:
+            raise Exception("Backend ({}) for session is returning a bad response!".format(url))

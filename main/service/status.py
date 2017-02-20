@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
+from datetime import datetime
+from multiprocessing import Lock
+
+import multiprocessing
 
 __author__ = "Ivan de Paz Centeno"
 
@@ -67,3 +72,83 @@ def get_status_by_name(status_code_name):
         result = SERVICE_STATUS_UNKNOWN
 
     return result
+
+
+class GlobalStatus(object):
+    """
+    Allows tracking status of each spawned process
+    """
+
+    def __init__(self, manager):
+        self.global_lock = Lock()
+        self.status_table = manager.dict()
+        self.manager = manager
+
+    def update_proc_progress(self, header, current, max=100):
+        """
+        Updates the text for the caller process with a progress bar.
+        :param header:
+        :param current:
+        :param min:
+        :param max:
+        :return:
+        """
+        self.update_proc("{} :: [{}%] {} ".format(self._create_progress_representation(current, max),
+                                                  round(current / max * 100, 2),
+                                                  header))
+
+    @staticmethod
+    def _create_progress_representation(current, max, max_chars=20):
+        result = "["
+
+        threshold = (max_chars * current) / max
+
+        for index in range(max_chars):
+
+            if index < threshold:
+                result += "#"
+            else:
+                result += "-"
+
+        result += "]"
+
+        return result
+
+    def update_proc(self, string_status):
+        """
+        Adds a register for PID caller to this method with the string status.
+        :param string_status: any string representative for the status of the process.
+        """
+
+        pid = os.getpid()
+
+        with self.global_lock:
+            now = datetime.now()
+            self.status_table[pid] = {
+                "time": now,
+                "status": string_status
+            }
+
+    def get_manager(self):
+        return self.manager
+
+    def __str__(self):
+        """
+        String representation of the global status.
+        :return:
+        """
+        with self.global_lock:
+            status_table = dict(self.status_table)
+
+        result = ""
+
+        for pid in list(set(status_table)):
+            status_value = status_table[pid]
+            result += "[{} - {}] - {}\n".format(pid, status_value["time"], status_value["status"])
+
+        return result
+
+
+
+manager = multiprocessing.Manager()
+status = GlobalStatus(manager)

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import re
 from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
+from main.service.status import status
 
 from main.transport_core.webcore import WebCore
 import json
@@ -46,13 +47,19 @@ class BingImages(SearchEngine):
             url += "&qft=+filterui:face-face"
 
         logging.info("Built url ({}) for request.".format(url))
+        status.update_proc_progress("{} ({}) *Built url ({}) for request*".format(self.__class__.__name__,
+                                                                                  search_words, url), 0)
+
+        status.update_proc_progress("{} ({}) *Retrieving URL*".format(self.__class__.__name__, search_words), 0)
 
         self.transport_core.get(url)
         self.transport_core.wait_for_elements_from_class("dg_u")
+        status.update_proc_progress("{} ({}) *Retrieved URL*".format(self.__class__.__name__, search_words), 0)
 
-        self._cache_all_page()
+        self._cache_all_page(search_words)
 
         logging.info("Get done. Loading elements JSON")
+        status.update_proc_progress("{} ({}) *Generating JSON*".format(self.__class__.__name__, search_words), 100)
 
         dg_u_elements = [BeautifulSoup(html_element, 'html.parser').find() for html_element in
                        self.transport_core.get_elements_html_by_class("dg_u", False)]
@@ -62,9 +69,12 @@ class BingImages(SearchEngine):
         result = [self._build_json_for(element, search_words) for element in dg_u_elements]
 
         logging.info("Retrieved {} elements".format(len(result)))
+        status.update_proc_progress("{} ({}) *Generated content for {} elements*".format(self.__class__.__name__,
+                                                                                         search_words,
+                                                                                         len(result)), 100)
         return result
 
-    def _cache_all_page(self):
+    def _cache_all_page(self, search_words):
         """
         This search engine adds content dynamically when you scroll down the page.
         We are interested in all the content we can get from the same page, so we
@@ -78,6 +88,8 @@ class BingImages(SearchEngine):
 
         while not finished:
             logging.info("images cached previously: {}, images cached currently: {}".format(previous_percent, current_percent))
+            status.update_proc_progress("{} ({}) *Caching page*".format(self.__class__.__name__, search_words),
+                                        current_percent, max=MAX_IMAGES_PER_REQUEST)
 
             if current_percent > MAX_IMAGES_PER_REQUEST or no_update_count > MAX_SCROLL_NO_UPDATE_IMAGES_THRESHOLD:
                 finished = True
@@ -92,6 +104,9 @@ class BingImages(SearchEngine):
             self.transport_core.scroll_to_bottom()
             elements = self.transport_core.get_elements_html_by_class("dg_u")
             current_percent = len(elements)
+
+        status.update_proc_progress("{} ({}) *Caching page*".format(self.__class__.__name__, search_words),
+                                    100)
 
     def _build_json_for(self, element, search_words):
 
@@ -111,7 +126,8 @@ class BingImages(SearchEngine):
             result = {'url': self._prepend_http_protocol(json_data['imgurl']),
                       'width': width,
                       'height': height,
-                      'desc': description+";"+search_words,
+                      'desc': description,
+                      'searchwords': search_words,
                       'source': 'bing'}
 
         except Exception as ex:

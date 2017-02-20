@@ -37,7 +37,8 @@ class DatasetBuilder(Service):
                  on_finished=None):
         Service.__init__(self)
         self.search_session = search_session
-        self.dataset = dataset_type(name, self.search_session, "{}".format(os.path.join(DEFAULT_DATASET_DIR, name)))
+
+        self.dataset = dataset_type(name, self.search_session, "{}".format(os.path.join(default_dataset_dir, name)))
 
         self.percent_crawled = 0
         self.percent_fetched = 0

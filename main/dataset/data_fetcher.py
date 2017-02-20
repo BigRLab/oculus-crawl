@@ -60,7 +60,7 @@ class DataFetcher(FetchPool, Service):
         new_request_list = []
 
         for request in request_list:
-            if 'url' in request and 'width' in request and 'height' in request and 'desc' in request and 'source' in request:
+            if 'url' in request and 'width' in request and 'height' in request and 'desc' in request and 'source' in request and 'searchwords' in request:
                 new_request_list.append(request)
 
         discarded_requests = len(request_list) - len(new_request_list)

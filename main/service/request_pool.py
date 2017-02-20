@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from multiprocessing import Manager
 from multiprocessing.pool import Pool
 from queue import Empty
+from threading import Lock
 from time import sleep
+
 import logging
+
+from main.service.status import status
 
 __author__ = "Ivan de Paz Centeno"
 
@@ -27,13 +32,22 @@ def process(queue_element):
     search_request = queue_element[0]
     logging.info("Processing request {}.".format(search_request))
 
+    status.update_proc("Processing request \"{}\" from {}".format(search_request.get_words(),
+                                                                  search_request.get_search_engine_proto().__name__))
+
     search_engine_proto = search_request.get_search_engine_proto()
 
     # This way we cache the search_engine between requests in the same thread.
     if not search_engine or search_engine.__class__ != search_engine_proto:
         search_engine = search_engine_proto()
 
-    retrieved_result = search_engine.retrieve(search_request)
+    try:
+
+        retrieved_result = search_engine.retrieve(search_request)
+
+    except Exception as ex:
+
+        retrieved_result = None
 
     return [search_request, retrieved_result]
 
@@ -47,23 +61,35 @@ class RequestPool(object):
     def __init__(self, pool_limit=1, time_secs_between_requests=None):
 
         self.manager = Manager()
+
         self.processing_queue = self.manager.Queue()
 
         self.pool = Pool(processes=pool_limit, initializer=self._init_pool_worker,
                          initargs=[time_secs_between_requests])
+
         self.processes_free = pool_limit
-        self.stop_processing = False
+        self._stop_processing = False
+        self.lock_process_variable = Lock()
 
     @staticmethod
     def _init_pool_worker(time_secs_between_requests):
         """
         Initializes the worker thread. Each worker of the pool has its own firefox and display instance.
-        :param self:
         :return:
         """
         global wait_seconds_between_requests
 
         wait_seconds_between_requests = time_secs_between_requests
+
+    def do_stop(self):
+        with self.lock_process_variable:
+            self._stop_processing = True
+
+    def _stop_requested(self):
+        with self.lock_process_variable:
+            stop_requested = self._stop_processing
+
+        return stop_requested
 
     def queue_request(self, search_request):
         """
@@ -74,26 +100,42 @@ class RequestPool(object):
         logging.info("Queued request {}.".format(search_request))
         self.processing_queue.put([search_request])
 
+    def get_processes_free(self):
+
+        with self.lock_process_variable:
+            processes_free = self.processes_free
+
+        return processes_free
+
+    def take_process(self):
+
+        with self.lock_process_variable:
+            self.processes_free -= 1
+
+    def process_freed(self):
+
+        with self.lock_process_variable:
+            self.processes_free += 1
+
     def process_queue(self):
         """
         Processes the queue until all the processes are busy or until the queue is empty
         :return:
         """
 
-        while self.processes_free > 0 and not self.stop_processing:
+        while self.get_processes_free() > 0 and not self._stop_requested():
             try:
                 queue_element = self.processing_queue.get(False)
                 logging.info(
-                    "Processing queue with {} free processes (stop flag is {}).".format(self.processes_free,
-                                                                                        self.stop_processing))
-                self.processes_free -= 1
-                result = self.pool.apply_async(process, args=(queue_element,), callback=self._process_finished)
+                    "Processing queue with {} free processes (stop flag is {}).".format(self.get_processes_free(),
+                                                                                        self._stop_requested()))
+                self.take_process()
 
+                result = self.pool.apply_async(process, args=(queue_element,), callback=self._process_finished)
 
             except Empty:
                 logging.info("No elements queued.")
-
-                return
+                break
 
     def _process_finished(self, wrapped_result):
         """
@@ -103,8 +145,7 @@ class RequestPool(object):
         :param wrapped_result:
         :return:
         """
-        self.processes_free += 1
-        self.process_queue()
+        self.process_freed()
 
         if hasattr(self, 'process_finished'):
             self.process_finished(wrapped_result)

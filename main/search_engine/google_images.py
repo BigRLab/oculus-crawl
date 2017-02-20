@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
+from main.service.status import status
 from main.transport_core.webcore import WebCore
 import urllib
 import json
@@ -29,6 +30,8 @@ class GoogleImages(SearchEngine):
             self.transport_core = search_request.get_transport_core_proto()()
             logging.info("Transport core created from proto.")
 
+        status.update_proc_progress("{} ({})".format(self.__class__.__name__, search_request.get_words()), 0)
+
         logging.debug("Retrieving image links from request {}.".format(search_request))
         return self._retrieve_image_links_data(search_request.get_words(), search_request.get_options())
 
@@ -40,26 +43,37 @@ class GoogleImages(SearchEngine):
         if 'face' in search_options:
             url += '&tbs=itp:face'
         logging.info("Built url ({}) for request.".format(url))
+        status.update_proc_progress("{} ({}) *Built url ({}) for request*".format(self.__class__.__name__,
+                                                                                  search_words, url), 0)
+
+        status.update_proc_progress("{} ({}) *Retrieving URL*".format(self.__class__.__name__, search_words), 0)
 
         self.transport_core.get(url)
+        status.update_proc_progress("{} ({}) *Retrieved URL*".format(self.__class__.__name__, search_words), 0)
 
-        self._cache_all_page()
+        self._cache_all_page(search_words)
 
         logging.info("Get done. Loading elements JSON")
+        status.update_proc_progress("{} ({}) *Generating JSON*".format(self.__class__.__name__, search_words), 100)
 
         json_elements = [json.loads(element) for element in self.transport_core.get_elements_html_by_class("rg_meta")]
 
+        status.update_proc_progress("{} ({}) *Generated content for {} elements*".format(self.__class__.__name__,
+                                                                                         search_words, len(json_elements)), 100)
         logging.info("Retrieved {} elements".format(len(json_elements)))
-        return [{'url': image['ou'], 'width': image['ow'], 'height': image['oh'], 'desc': image['pt']+";"+search_words,
+        return [{'url': image['ou'], 'width': image['ow'], 'height': image['oh'], 'desc': image['pt'],
+                 'searchwords':search_words,
                  'source':'google'} for image in json_elements]
 
-    def _cache_all_page(self):
+    def _cache_all_page(self, search_words):
         """
         This search engine adds content dynamically when you scroll down the page.
         We are interested in all the content we can get from the same page, so we
         simulate scroll downs until no more content is added.
         :return:
         """
+        # We know maximum is 400 for google
+
         previous_percent = -1
         current_percent = 0
 
@@ -68,6 +82,9 @@ class GoogleImages(SearchEngine):
             self.transport_core.scroll_to_bottom()
             elements = self.transport_core.get_elements_html_by_class("rg_meta")
             current_percent = len(elements)
+
+            status.update_proc_progress("{} ({}) *Caching page*".format(self.__class__.__name__, search_words),
+                                        current_percent, max=400)
 
 # Register the class to enable deserialization.
 SEARCH_ENGINES[str(GoogleImages)] = GoogleImages

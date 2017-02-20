@@ -75,6 +75,7 @@ class Service(object):
         self.__set_stop_flag__(False)
         self.__reset_thread__()
         self.worker_thread.start()
+
         self.__set_status__(SERVICE_RUNNING)
 
     def stop(self, wait_for_finish=True):

@@ -111,7 +111,8 @@ class FlickrImages(SearchEngine):
             date_taken = BeautifulSoup(self.transport_core.get_elements_html_by_class("date-taken-label", False)[0], 'html.parser').find()["title"]
             tag_description = [tag["title"] for tag in tags]
 
-            image_json['desc'] = "{};{};{}".format(date_taken, ";".join(tag_description), search_words)
+            image_json['desc'] = "{};{}".format(date_taken, ";".join(tag_description))
+            image_json['searchwords'] = search_words
             image_json['source'] = "flickr"
 
         # ELSE: We skip this iteration because it is spam

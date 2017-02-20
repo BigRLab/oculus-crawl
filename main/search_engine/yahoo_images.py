@@ -3,6 +3,7 @@
 import html
 
 from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
+from main.service.status import status
 from main.transport_core.webcore import WebCore
 import urllib
 import urllib.parse as urlparse
@@ -35,15 +36,25 @@ class YahooImages(SearchEngine):
             self.transport_core = search_request.get_transport_core_proto()()
             logging.debug("Transport core created from proto.")
 
+        status.update_proc_progress("{} ({})".format(self.__class__.__name__, search_request.get_words()), 0)
+
         logging.info("Retrieving image links from request {}.".format(search_request))
-        return self._retrieve_image_links_data(search_request.get_words(), search_request.get_options())
+
+        result = self._retrieve_image_links_data(search_request.get_words(), search_request.get_options())
+
+        return result
 
     def _retrieve_image_links_data(self, search_words, search_options):
 
         url = "https://es.images.search.yahoo.com"
         logging.info("Built url ({}) for request.".format(url))
+        status.update_proc_progress("{} ({}) *Built url ({}) for request*".format(self.__class__.__name__,
+                                                                                  search_words, url), 0)
+
+        status.update_proc_progress("{} ({}) *Retrieving URL*".format(self.__class__.__name__, search_words), 0)
 
         self.transport_core.get(url)
+        status.update_proc_progress("{} ({}) *Retrieved URL*".format(self.__class__.__name__, search_words), 0)
 
         # Since yahoo builds the url dynamically per client request, we need to pass through their ring.
         # We fill the search input box
@@ -61,7 +72,8 @@ class YahooImages(SearchEngine):
             # We enable the portrait option if needed.
             self.transport_core.click_button_by_class("portrait")
 
-        self._cache_all_page()
+        self._cache_all_page(search_words)
+        status.update_proc_progress("{} ({}) *Generating JSON*".format(self.__class__.__name__, search_words), 100)
 
         logging.info("Get done. Loading elements JSON")
         elements_holder = self.transport_core.get_elements_html_by_class("ld ", False)
@@ -71,11 +83,13 @@ class YahooImages(SearchEngine):
                        elements_holder]
         logging.info("Building json...")
         result = [self._build_json_for(element, search_words) for element in ld_elements]
-
+        status.update_proc_progress("{} ({}) *Generated content for {} elements*".format(self.__class__.__name__,
+                                                                                         search_words,
+                                                                                         len(result)), 100)
         logging.info("Retrieved {} elements in JSON format successfully".format(len(result)))
         return result
 
-    def _cache_all_page(self):
+    def _cache_all_page(self, search_words):
         """
         This search engine adds content dynamically when you scroll down the page.
         We are interested in all the content we can get from the same page, so we
@@ -112,12 +126,14 @@ class YahooImages(SearchEngine):
 
                 elements = self.transport_core.get_elements_html_by_class("ld")
                 current_percent = len(elements)
+
+                status.update_proc_progress("{} ({}) *Caching page*".format(self.__class__.__name__, search_words),
+                                            current_percent, max=MAX_IMAGES_PER_REQUEST)
             except Exception as ex:
                 logging.info("Error: {}".format(str(ex)))
                 finished = True
 
     def _build_json_for(self, element, search_words):
-
 
         if element.has_attr('data'):
             data = element["data"]
@@ -138,7 +154,8 @@ class YahooImages(SearchEngine):
                     href = link["href"]
                     parsed_href = urlparse.parse_qs(urlparse.urlparse(href).query)
                     result = {'url': self._prepend_http_protocol(parsed_href['imgurl'][0]), 'width': parsed_href['w'][0],
-                              'height': parsed_href['h'][0], 'desc': parsed_href['name'][0]+";"+search_words,
+                              'height': parsed_href['h'][0], 'desc': parsed_href['name'][0],
+                              'searchwords':search_words,
                               'source': 'yahoo'}
                 except Exception as ex:
                     result = {}
@@ -147,7 +164,6 @@ class YahooImages(SearchEngine):
 
                 result = {}
 
-        print("Result is: {}".format(result))
         return result
 
 # Register the class to enable deserialization.
