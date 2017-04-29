@@ -1,5 +1,5 @@
 # oculus-crawl
-OculusCrawl project aimed to perform automatic crawl on search engines based on some criteria. It is scalable and service-based.
+OculusCrawl project aimed to perform automatic crawl on search engines based on some criteria. It is scalable and service-based. Currently, it is supported Google Images, Yahoo Images, Bing Images, Flickr and Microsoft HowOld as search engines, on top of HTTP transport protocol.
 
 ![alt text][logo]
 
