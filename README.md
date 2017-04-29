@@ -3,7 +3,7 @@ OculusCrawl project aimed to perform automatic crawl on search engines based on 
 
 ![alt text][logo]
 
-[logo]: https://github.com/ipazc/dtb/blob/master/oculus-crawl.jpeg "Oculus Crawl tool."
+[logo]: https://github.com/ipazc/oculus-crawl/blob/master/oculus-crawl.jpeg "Oculus Crawl tool."
 
 # Requirements
 It is required Ubuntu >= 14.04 or Debian >= 8 Jessie with Selenium framework, Firefox and its selenium drivers.
