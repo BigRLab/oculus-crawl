@@ -5,10 +5,9 @@ import os
 
 import sys
 from time import sleep, time
-
+import datetime
 from main.dataset.remote_dataset_factory import RemoteDatasetFactory
 from main.search_engine.bing_images import BingImages
-from main.search_engine.flickr_images import FlickrImages
 from main.search_engine.google_images import GoogleImages
 from main.search_engine.yahoo_images import YahooImages
 from main.search_session.search_request import SearchRequest
@@ -17,25 +16,88 @@ from main.service.status import SERVICE_CREATED_DATASET, get_status_name, SERVIC
 
 __author__ = "Ivan de Paz Centeno"
 
+
+def force_exit():
+    exit(-1)
+
+def print_usage():
+    """
+    Prints the usage pattern.
+    """
+    print("Usage: ocrawl URL -n \"DATASET_NAME\" -s \"SEARCH_KEYWORDS:[ADJETIVE LIST TO COMBINE]\" -s \"SEARC...\"  [-b BACKUP_TIME_SECONDS]")
+
+def get_options():
+    """
+    Retrieves the argument options from the input.
+    :return:
+    """
+    options = {}
+
+    try:
+        required_options = ["url", "dataset_name", "search_keywords", "backup_time_seconds"]
+        key = None
+
+        for arg in sys.argv[1:]:
+            if key is not None:
+
+                if key == "search_keywords":
+                    options[key].append({arg.split(":")[0]: arg.split(":")[1]})
+                else:
+                    options[key] = arg
+
+                key = None
+                continue
+
+            if arg == "-n":
+                key = "dataset_name"
+            elif arg == "-s":
+                key = "search_keywords"
+            elif arg == "-b":
+                key = "backup_time_seconds"
+            elif arg == "-h":
+                print_usage()
+                force_exit()
+            else:
+                options['url'] = arg
+
+            if key == "search_keywords" and key not in options:
+                options[key] = {}
+
+            if key in options and key != "search_keywords":
+                raise Exception("Error: option {} redifined.".format(key))
+
+        if "dataset_name" not in options:
+            options['dataset_name'] = "noname_"+datetime.datetime.fromtimestamp(time()).strftime('%Y%m%d-%H-%M-%S')
+
+        if "backup_time_seconds" not in options:
+            options['backup_time_seconds'] = "180" # 3 minutes
+
+        for key in required_options:
+            if key not in options:
+                raise Exception("Missing option: {}.".format(key))
+
+    except Exception as ex:
+        print("Error: {}".format(ex))
+        force_exit()
+
+    return options
+
+
+options = get_options()
+
+# A backup folder, it is important.
 try:
-    os.mkdir("backups/")
+    os.mkdir(os.path.join(options['datasets_destination_uri'],"backups/"))
 except:
     pass
 
-root = logging.getLogger()
-root.setLevel(logging.INFO)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-root.addHandler(ch)
-
-remote_dataset_factory = RemoteDatasetFactory("http://localhost:24005/")
+remote_dataset_factory = RemoteDatasetFactory(options['url'])
 
 # We want now to inject some search.
 
 #dataset_name = "test_"+str(time())
-dataset_name = "12yo"
+dataset_name = options['dataset_name']
+backup_time_seconds = int(options['backup_time_seconds'])
 
 # Print iterations progress
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100):
@@ -68,41 +130,34 @@ def generate_search_requests(keywords, append_adjetives=None, portraits=False):
     :param portraits:
     :return: search requests array to append to the factory.
     """
-    #search_engines = [YahooImages, GoogleImages, BingImages]
-    search_engines = [YahooImages, GoogleImages]
+    search_engines = [YahooImages, GoogleImages, BingImages]
 
-    options = {}
+    _options = {}
 
     if portraits:
-        options['face'] = 'true'
+        _options['face'] = 'true'
 
     keywords_list = [keywords]
 
     if append_adjetives:
         keywords_list = ["{} {}".format(keywords, adjetive) for adjetive in append_adjetives]
 
-    return [SearchRequest(adjetived_keywords, options, search_engine) for search_engine in search_engines for
+    return [SearchRequest(adjetived_keywords, _options, search_engine) for search_engine in search_engines for
             adjetived_keywords in keywords_list]
 
 try:
     remote_dataset_factory.create_dataset(dataset_name)
 
+    search_keywords_dict = options['search_keywords']
+
+    for search_keywords, adjetives in search_keywords_dict.items():
+        
+
     keywords_list = [
-        "12 year old boy", "12 year old girl"
+        "tree"
     ]
 
-    '''"2 years old boy", "2 years old girl",
-    "3 years old boy", "3 years old girl",
-    "4 years old boy", "4 years old girl",
-    "5 years old boy", "5 years old girl",
-    "6 years old boy", "6 years old girl",
-    "7 years old boy", "7 years old girl",
-    "8 years old boy", "8 years old girl",
-    "9 years old boy", "9 years old girl",
-    "10 years old boy", "10 years old girl",
-    "11 years old boy", "11 years old girl",
-    "12 years old boy", "12 years old girl"'''
-    adjetives = ["sad", "happy", "small", "big", "crying", "cute", "smiling", "moving", "dancing", "cousin", "funny", "clever", ""]
+    adjetives = ["green", "yellow", "tall", "small", "big"]
     search_requests = []
 
     for keywords in keywords_list:
@@ -169,7 +224,7 @@ try:
         if not completed:
             completed = remote_session.get_completion_progress() == 100
 
-            if time_passed % 180 == 0:
+            if time_passed % backup_time_seconds == 0:
                 remote_session.save_session("backups/backup_{}_{}.json".format(dataset_name, remote_session.get_completion_progress()))
 
 except Exception as ex:
