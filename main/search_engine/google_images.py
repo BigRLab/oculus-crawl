@@ -22,7 +22,7 @@ class GoogleImages(SearchEngine):
          search. The following options are currently accepted:
             'face' -> Select the face option as a search filter. Google images contains a face option in the search that
                     this flag enables. It will result in images of faces related with the given keywords.
-        :return:
+        :return: A json wrapping all the result retrieved from the search_request.
         """
         # This way we cache the transport core.
 

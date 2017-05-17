@@ -104,10 +104,10 @@ class CrawlerService(Service, RequestPool):
     def pause(self):
         self.stop_processing = True
 
-    def stop(self, wait_to_finish=True):
+    def stop(self, wait_for_finish=True):
         print("Stop of crawler service requested")
         logging.info("Crawler stopped from digesting requests.")
-        Service.stop(self, wait_to_finish)
+        Service.stop(self, wait_for_finish)
 
     def __internal_thread__(self):
         Service.__internal_thread__(self)

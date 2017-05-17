@@ -44,7 +44,7 @@ class CrawlingProcess(Service):
         # We pick a random session from the list
         selected_session = None
 
-        while len(datasets_names) > 0 and not selected_session and not self.__get_stop_flag__():
+        while len(datasets_names) > 0 and selected_session is None and not self.__get_stop_flag__():
             name = random.choice(list(datasets_names))
             random_session = self.remote_dataset_factory.get_session_from_dataset_name(name)
             datasets_names.remove(name)
@@ -115,6 +115,7 @@ class CrawlingProcess(Service):
                 self._feed_crawler(session)
 
             except Exception as ex:
+                global_status.update_proc("Nothing to crawl: {}".format(ex))
                 logging.info("Nothing to crawl: {}".format(ex))
                 logging.info("Waiting {} seconds before querying again".format(self.wait_time_between_tries))
                 sleep(self.wait_time_between_tries)

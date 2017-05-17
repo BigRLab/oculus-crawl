@@ -69,13 +69,12 @@ class Controller(object):
         Constructor of the controller.
         :param flask_web_app: flask app object.
         :param dataset_factory:  factory for datasets to manipulate.
-        :param config:  config object with all the information regarding the definition of services.
-        :param controller_type:  string containing the type of the controller ("CRAWLER")
-        :param controller_subtype:  string containing the subtype of the controller ("SESSION")
+        :param options:  set of options specified as program arguments.
         """
         self.lock = Lock()
         self.flask_web_app = flask_web_app
         self.dataset_factory = dataset_factory
+
         self.exposed_methods = [
             self.handle_invalid_request
         ]

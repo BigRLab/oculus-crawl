@@ -74,7 +74,7 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-crawling_process = CrawlingProcess(options['url'], options['workers'], float(options['wait_time_between_tries']))
+crawling_process = CrawlingProcess(options['url'], int(options['workers']), float(options['wait_time_between_tries']))
 
 crawling_process.start()
 

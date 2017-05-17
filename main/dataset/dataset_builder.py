@@ -92,6 +92,8 @@ class DatasetBuilder(Service):
                 self.percent_crawled = percent_crawled
                 self.percent_fetched = percent_fetched
 
+            time.sleep(0.05)
+
         if not self.__get_stop_flag__():
             self.dataset.build_metadata()
             self.search_session.save_session(os.path.join(self.dataset.get_root_folder(), "search_session.ses"))

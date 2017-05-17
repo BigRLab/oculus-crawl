@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import json
 import logging
 import os
 
@@ -11,13 +12,23 @@ from main.search_engine.bing_images import BingImages
 from main.search_engine.google_images import GoogleImages
 from main.search_engine.yahoo_images import YahooImages
 from main.search_session.search_request import SearchRequest
+from main.service.global_status import global_status
 from main.service.status import SERVICE_CREATED_DATASET, get_status_name, SERVICE_STATUS_UNKNOWN, SERVICE_RUNNING, \
     get_status_by_name
 
 __author__ = "Ivan de Paz Centeno"
 
 
+root = logging.getLogger()
+root.setLevel(logging.INFO)
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+root.addHandler(ch)
+
 def force_exit():
+    global_status.stop()
     exit(-1)
 
 def print_usage():
@@ -41,7 +52,7 @@ def get_options():
             if key is not None:
 
                 if key == "search_keywords":
-                    options[key].append({arg.split(":")[0]: arg.split(":")[1]})
+                    options[key][arg.split(":")[0]] = arg.split(":")[1]
                 else:
                     options[key] = arg
 
@@ -114,7 +125,7 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_lengt
     format_str = "{0:." + str(decimals) + "f}"
     percents = format_str.format(100 * (iteration / float(total)))
     filled_length = int(round(bar_length * iteration / float(total)))
-    bar = '' * filled_length + '-' * (bar_length - filled_length)
+    bar = '#' * filled_length + '-' * (bar_length - filled_length)
     sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, bar, percents, '%', suffix)),
     if iteration == total:
         sys.stdout.write('\n')
@@ -130,7 +141,7 @@ def generate_search_requests(keywords, append_adjetives=None, portraits=False):
     :param portraits:
     :return: search requests array to append to the factory.
     """
-    search_engines = [YahooImages, GoogleImages, BingImages]
+    search_engines = [YahooImages, GoogleImages] # Bing is failing by now, removed from the list.
 
     _options = {}
 
@@ -149,19 +160,15 @@ try:
     remote_dataset_factory.create_dataset(dataset_name)
 
     search_keywords_dict = options['search_keywords']
-
-    for search_keywords, adjetives in search_keywords_dict.items():
-        
-
-    keywords_list = [
-        "tree"
-    ]
-
-    adjetives = ["green", "yellow", "tall", "small", "big"]
     search_requests = []
 
-    for keywords in keywords_list:
-        search_requests += generate_search_requests(keywords, adjetives, False)
+    for search_keywords, adjetives_str in search_keywords_dict.items():
+        try:
+            adjetives = json.loads(adjetives_str)
+            search_requests += generate_search_requests(search_keywords, adjetives, False)
+        except:
+            print("Adjetives do not have a valid format. Must be JSON-compliant.")
+            exit(-1)
 
     for search_request in search_requests:
         print ("{}: {}".format(search_request.get_search_engine_proto() ,search_request.get_words()))
@@ -227,5 +234,8 @@ try:
             if time_passed % backup_time_seconds == 0:
                 remote_session.save_session("backups/backup_{}_{}.json".format(dataset_name, remote_session.get_completion_progress()))
 
+    print("Dataset is now hosted by the factory. Visit the factory public interface to access it.")
 except Exception as ex:
     logging.info("Error: {}".format(ex))
+
+global_status.stop()

@@ -20,8 +20,10 @@ class DatasetFactory(Service):
     It is Factory and a service, publishing some RPC through a TCP port.
     """
 
-    def __init__(self, autostart=True):
+    def __init__(self, autostart=True, publish_dir="/tmp/"):
         Service.__init__(self)
+
+        self.publish_dir = publish_dir
 
         with self.lock:
             self.datasets_builders_working = {}
@@ -123,7 +125,7 @@ class DatasetFactory(Service):
             with self.lock:
                 search_session = SearchSession()
                 dataset_builder = DatasetBuilder(search_session, name, autostart=True, dataset_type=dataset_type,
-                                                 autoclose_search_session_on_exit=True,
+                                                 autoclose_search_session_on_exit=True, publish_dir=self.publish_dir,
                                                  on_finished=self._on_builder_finished)
                 logging.info("Started dataset builder for {}".format(name))
                 self.datasets_builders_working[name] = dataset_builder

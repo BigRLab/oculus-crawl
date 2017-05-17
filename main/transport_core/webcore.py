@@ -31,6 +31,7 @@ class WebCore(object):
             profile.set_preference("network.http.use-cache", False)
 
             if not gui:
+                print("Virtual browser display!")
                 self.virtual_browser_display = Display(visible=0, size=(800, 600))
                 self.virtual_browser_display.start()
 
@@ -98,7 +99,7 @@ class WebCore(object):
         except:
             pass
 
-        if not self.gui:
+        if not self.gui and self.virtual_browser_display:
             self.virtual_browser_display.stop()
 
     def send_text_to_input_by_id(self, param, text):
