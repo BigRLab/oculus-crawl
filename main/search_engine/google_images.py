@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
-from main.service.status import status
+from main.service.global_status import global_status
 from main.transport_core.webcore import WebCore
 import urllib
 import json
@@ -30,7 +30,7 @@ class GoogleImages(SearchEngine):
             self.transport_core = search_request.get_transport_core_proto()()
             logging.info("Transport core created from proto.")
 
-        status.update_proc_progress("{} ({})".format(self.__class__.__name__, search_request.get_words()), 0)
+        global_status.update_proc_progress("{} ({})".format(self.__class__.__name__, search_request.get_words()), 0)
 
         logging.debug("Retrieving image links from request {}.".format(search_request))
         return self._retrieve_image_links_data(search_request.get_words(), search_request.get_options())
@@ -43,22 +43,22 @@ class GoogleImages(SearchEngine):
         if 'face' in search_options:
             url += '&tbs=itp:face'
         logging.info("Built url ({}) for request.".format(url))
-        status.update_proc_progress("{} ({}) *Built url ({}) for request*".format(self.__class__.__name__,
+        global_status.update_proc_progress("{} ({}) *Built url ({}) for request*".format(self.__class__.__name__,
                                                                                   search_words, url), 0)
 
-        status.update_proc_progress("{} ({}) *Retrieving URL*".format(self.__class__.__name__, search_words), 0)
+        global_status.update_proc_progress("{} ({}) *Retrieving URL*".format(self.__class__.__name__, search_words), 0)
 
         self.transport_core.get(url)
-        status.update_proc_progress("{} ({}) *Retrieved URL*".format(self.__class__.__name__, search_words), 0)
+        global_status.update_proc_progress("{} ({}) *Retrieved URL*".format(self.__class__.__name__, search_words), 0)
 
         self._cache_all_page(search_words)
 
         logging.info("Get done. Loading elements JSON")
-        status.update_proc_progress("{} ({}) *Generating JSON*".format(self.__class__.__name__, search_words), 100)
+        global_status.update_proc_progress("{} ({}) *Generating JSON*".format(self.__class__.__name__, search_words), 100)
 
         json_elements = [json.loads(element) for element in self.transport_core.get_elements_html_by_class("rg_meta")]
 
-        status.update_proc_progress("{} ({}) *Generated content for {} elements*".format(self.__class__.__name__,
+        global_status.update_proc_progress("{} ({}) *Generated content for {} elements*".format(self.__class__.__name__,
                                                                                          search_words, len(json_elements)), 100)
         logging.info("Retrieved {} elements".format(len(json_elements)))
         return [{'url': image['ou'], 'width': image['ow'], 'height': image['oh'], 'desc': image['pt'],
@@ -83,7 +83,7 @@ class GoogleImages(SearchEngine):
             elements = self.transport_core.get_elements_html_by_class("rg_meta")
             current_percent = len(elements)
 
-            status.update_proc_progress("{} ({}) *Caching page*".format(self.__class__.__name__, search_words),
+            global_status.update_proc_progress("{} ({}) *Caching page*".format(self.__class__.__name__, search_words),
                                         current_percent, max=400)
 
 # Register the class to enable deserialization.

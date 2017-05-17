@@ -9,7 +9,7 @@ from time import sleep
 
 import logging
 
-from main.service.status import status
+from main.service.global_status import global_status
 
 __author__ = "Ivan de Paz Centeno"
 
@@ -32,7 +32,7 @@ def process(queue_element):
     search_request = queue_element[0]
     logging.info("Processing request {}.".format(search_request))
 
-    status.update_proc("Processing request \"{}\" from {}".format(search_request.get_words(),
+    global_status.update_proc("Processing request \"{}\" from {}".format(search_request.get_words(),
                                                                   search_request.get_search_engine_proto().__name__))
 
     search_engine_proto = search_request.get_search_engine_proto()

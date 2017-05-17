@@ -3,7 +3,7 @@
 import html
 
 from main.search_engine.search_engine import SEARCH_ENGINES, SearchEngine
-from main.service.status import status
+from main.service.global_status import global_status
 from main.transport_core.webcore import WebCore
 import urllib
 import urllib.parse as urlparse
@@ -36,7 +36,7 @@ class YahooImages(SearchEngine):
             self.transport_core = search_request.get_transport_core_proto()()
             logging.debug("Transport core created from proto.")
 
-        status.update_proc_progress("{} ({})".format(self.__class__.__name__, search_request.get_words()), 0)
+        global_status.update_proc_progress("{} ({})".format(self.__class__.__name__, search_request.get_words()), 0)
 
         logging.info("Retrieving image links from request {}.".format(search_request))
 
@@ -48,13 +48,13 @@ class YahooImages(SearchEngine):
 
         url = "https://es.images.search.yahoo.com"
         logging.info("Built url ({}) for request.".format(url))
-        status.update_proc_progress("{} ({}) *Built url ({}) for request*".format(self.__class__.__name__,
+        global_status.update_proc_progress("{} ({}) *Built url ({}) for request*".format(self.__class__.__name__,
                                                                                   search_words, url), 0)
 
-        status.update_proc_progress("{} ({}) *Retrieving URL*".format(self.__class__.__name__, search_words), 0)
+        global_status.update_proc_progress("{} ({}) *Retrieving URL*".format(self.__class__.__name__, search_words), 0)
 
         self.transport_core.get(url)
-        status.update_proc_progress("{} ({}) *Retrieved URL*".format(self.__class__.__name__, search_words), 0)
+        global_status.update_proc_progress("{} ({}) *Retrieved URL*".format(self.__class__.__name__, search_words), 0)
 
         # Since yahoo builds the url dynamically per client request, we need to pass through their ring.
         # We fill the search input box
@@ -73,7 +73,7 @@ class YahooImages(SearchEngine):
             self.transport_core.click_button_by_class("portrait")
 
         self._cache_all_page(search_words)
-        status.update_proc_progress("{} ({}) *Generating JSON*".format(self.__class__.__name__, search_words), 100)
+        global_status.update_proc_progress("{} ({}) *Generating JSON*".format(self.__class__.__name__, search_words), 100)
 
         logging.info("Get done. Loading elements JSON")
         elements_holder = self.transport_core.get_elements_html_by_class("ld ", False)
@@ -83,7 +83,7 @@ class YahooImages(SearchEngine):
                        elements_holder]
         logging.info("Building json...")
         result = [self._build_json_for(element, search_words) for element in ld_elements]
-        status.update_proc_progress("{} ({}) *Generated content for {} elements*".format(self.__class__.__name__,
+        global_status.update_proc_progress("{} ({}) *Generated content for {} elements*".format(self.__class__.__name__,
                                                                                          search_words,
                                                                                          len(result)), 100)
         logging.info("Retrieved {} elements in JSON format successfully".format(len(result)))
@@ -127,7 +127,7 @@ class YahooImages(SearchEngine):
                 elements = self.transport_core.get_elements_html_by_class("ld")
                 current_percent = len(elements)
 
-                status.update_proc_progress("{} ({}) *Caching page*".format(self.__class__.__name__, search_words),
+                global_status.update_proc_progress("{} ({}) *Caching page*".format(self.__class__.__name__, search_words),
                                             current_percent, max=MAX_IMAGES_PER_REQUEST)
             except Exception as ex:
                 logging.info("Error: {}".format(str(ex)))

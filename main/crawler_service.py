@@ -8,7 +8,7 @@ from time import sleep
 
 import logging
 
-from main.service.status import status
+from main.service.global_status import  global_status
 
 __author__ = "Ivan de Paz Centeno"
 
@@ -83,7 +83,7 @@ class CrawlerService(Service, RequestPool):
                 self.search_session.get_completion_progress(), search_request, len(crawl_result)
             ))
 
-        status.update_proc_progress("Retrieving data from search engines...",
+        global_status.update_proc_progress("Retrieving data from search engines...",
                                     self.search_session.get_completion_progress())
 
         if self.search_session.get_completion_progress() == 100:
@@ -105,6 +105,7 @@ class CrawlerService(Service, RequestPool):
         self.stop_processing = True
 
     def stop(self, wait_to_finish=True):
+        print("Stop of crawler service requested")
         logging.info("Crawler stopped from digesting requests.")
         Service.stop(self, wait_to_finish)
 
