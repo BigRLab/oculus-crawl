@@ -26,7 +26,7 @@ def route(*args, **kwargs):
             # At this level we have the app defined, extracted from self.
 
             partial_func = partial(func, self)
-            app.add_url_rule(*args, "{}.{}".format(self.__class__.__name__, func.__name__), partial_func, **kwargs)
+            app.add_url_rule(*(args + ("{}.{}".format(self.__class__.__name__, func.__name__), partial_func)), **kwargs)
 
         return decorator2
 
@@ -51,7 +51,7 @@ def error_handler(*args, **kwargs):
 
             partial_func = partial(func, self)
 
-            app.register_error_handler(*args, partial_func)
+            app.register_error_handler(*(args, partial_func))
 
         return decorator2
 

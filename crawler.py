@@ -24,7 +24,7 @@ URL = "http://localhost:24005"
 #root.addHandler(ch)
 
 FINISH = False
-CRAWLER_PROCESSES = 4
+CRAWLER_PROCESSES = 1
 WAIT_TIME_BETWEEN_TRIES = 1    # seconds
 
 remote_dataset_factory = RemoteDatasetFactory(URL)
@@ -32,18 +32,15 @@ remote_dataset_factory = RemoteDatasetFactory(URL)
 # we check for new sessions to crawl
 crawler = None
 
-
-def print_status():
-    status_string = str(status)
-    status_string = "{}{}".format("\033[F" * (len(status_string.split("\n"))), status_string)
-    print(status_string)
-
-print("\n"*(CRAWLER_PROCESSES+3))
 while not FINISH:
-
     status.update_proc("Accessing remote dataset factory at {}".format(URL))
 
-    datasets_names = remote_dataset_factory.get_dataset_builder_names()
+    try:    
+        datasets_names = remote_dataset_factory.get_dataset_builder_names()
+    except Exception as ex:
+        status.update_proc("Remote dataset factory is not active at {}".format(URL))
+        sleep(1)
+        continue
 
     try:
         # We pick a random session from the list
@@ -103,3 +100,4 @@ while not FINISH:
 
 status.update_proc("Finished.")
 crawler.stop()
+status.stop()

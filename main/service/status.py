@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import time
 from datetime import datetime
 from multiprocessing import Lock
+from main.service.service import Service
 
 import multiprocessing
 
@@ -74,7 +76,7 @@ def get_status_by_name(status_code_name):
     return result
 
 
-class GlobalStatus(object):
+class GlobalStatus(Service):
     """
     Allows tracking status of each spawned process
     """
@@ -148,7 +150,30 @@ class GlobalStatus(object):
 
         return result
 
+    def __internal_thread__(self):
+        """
+        Internal backgrounded code. Prints the current status of the crawler and its threads.
+ 
+        :return: None
+        """
+
+        lines_handled = 0
+
+        while not self.__get_stop_flag():
+            status_string = str(self)
+            lines_count = len(status_string.split("\n"))
+           
+            lines_to_add = max(0, lines_count-lines_handled)
+            lines_handled = lines_count
+            print("\n"*lines_to_add, end="")
+
+            status_string = "{}{}".format("\033[F" * lines_handled, status_string)
+            print(status_string)
+            time.sleep(0.5)
+
+        return None
 
 
 manager = multiprocessing.Manager()
 status = GlobalStatus(manager)
+status.start()

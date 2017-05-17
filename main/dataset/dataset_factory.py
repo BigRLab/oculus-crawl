@@ -63,7 +63,8 @@ class DatasetFactory(Service):
 
         with self.lock:
             if name in self.datasets_builders_working:
-                percent_done_set = [*self.datasets_builders_working[name].get_percent_done()]
+                percent_crawled, percent_fetched = self.datasets_builders_working[name].get_percent_done()
+                percent_done_set = [percent_crawled, percent_fetched]
                 status = self.datasets_builders_working[name].get_status()
 
                 percent_status_map = {
