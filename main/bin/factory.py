@@ -6,28 +6,44 @@ import sys
 from main.controllers.controller_factory import ControllerFactory
 from main.search_engine import yahoo_images, bing_images, google_images, howold_images, flickr_images
 from main.dataset.dataset_factory import DatasetFactory
-
+from main.service.global_status import global_status
 
 __author__ = "Ivan de Paz Centeno"
 
+def force_exit():
+    global_status.stop()
+    exit(-1)
+
+def print_usage():
+    """
+    Prints the usage pattern.
+    """
+    print("Usage: factory HOST -p PORT")
 
 def get_options():
     """
     Retrieves the argument options from the input.
     :return:
     """
+    options = {}
+
     try:
         required_options = ["host", "port"]
-        options = {}
-        key = ""
+        key = None
 
-        for arg in sys.argv:
+        for arg in sys.argv[1:]:
+            if key is not None:
+                options[key] = arg
+                key = None
+                continue
+
             if arg == "-p":
                 key = "port"
             elif arg == "-h":
-                print("Usage: factory HOST -p PORT")
+                print_usage()
+                force_exit()
             else:
-                key = "host"
+                options['host'] = arg
 
             if key in options:
                 raise Exception("Error: option {} redifined.".format(key))
@@ -35,12 +51,15 @@ def get_options():
         if "port" not in options:
             options['port'] = 24005
 
-        if not all(key in options for key in required_options):
-            raise Exception("Missing options {}.".format([key for key in required_options not in options]))
+        for key in required_options:
+            if key not in options:
+                raise Exception("Missing option: {}.".format(key))
 
     except Exception as ex:
         print("Error: {}".format(ex))
-        sys.exit(-1)
+        force_exit()
+
+    return options
 
 
 options = get_options()

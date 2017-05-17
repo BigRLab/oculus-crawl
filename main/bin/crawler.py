@@ -10,26 +10,42 @@ from main.service.global_status import global_status
 __author__ = "Ivan de Paz Centeno"
 
 
+def force_exit():
+    global_status.stop()
+    exit(-1)
+
+def print_usage():
+    """
+    Prints the usage pattern.
+    """
+    print("Usage: crawler URL -w WORKERS_COUNT -t TIME_WAIT_BETWEEN_TRIES_IN_SECONDS")
 
 def get_options():
     """
     Retrieves the argument options from the input.
     :return:
     """
+    options = {}
+
     try:
         required_options = ["url", "workers", "wait_time_between_tries"]
-        options = {}
         key = ""
 
         for arg in sys.argv:
+            if key is not None:
+                options[key] = arg
+                key = None
+                continue
+
             if arg == "-h":
-                print("Usage: crawler URL -w WORKERS_COUNT -t TIME_WAIT_BETWEEN_TRIES_IN_SECONDS")
+                print_usage()
+                force_exit()
             elif arg == "-w":
                 key = "workers"
             elif arg == "-t":
                 key = "wait_time_between_tries"
             else:
-                key = "url"
+                options["url"] = arg
 
             if key in options:
                 raise Exception("Error: option {} redifined.".format(key))
@@ -40,12 +56,15 @@ def get_options():
         if "wait_time_between_tries" not in options:
             options['wait_time_between_tries'] = 1
 
-        if not all(key in options for key in required_options):
-            raise Exception("Missing options {}.".format([key for key in required_options not in options]))
+        for key in required_options:
+            if key not in options:
+                raise Exception("Missing option: {}.".format(key))
 
     except Exception as ex:
         print("Error: {}".format(ex))
-        sys.exit(-1)
+        force_exit()
+
+    return options
 
 
 options = get_options()
@@ -55,7 +74,7 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-crawling_process = CrawlingProcess(options['url'], options['workers'], options['time_wait_between_tries'])
+crawling_process = CrawlingProcess(options['url'], options['workers'], float(options['wait_time_between_tries']))
 
 crawling_process.start()
 
