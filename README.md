@@ -46,7 +46,7 @@ This will start the crawler in the machine with as many workers as `${NUM_WORKER
 3. **On any computer, execute the ocrawl client to request a new dataset.**
 
 ```bash
-$ docker run -ti --rm --name o-crawler -v ${LOCAL_BACKUPS_FOLDER}:/backups dkmivan/oculus-crawl ocrawl http://${EXTENRAL_HOST}:${EXTERNAL_PORT} -n ${DATASET_NAME} -s '${SEARCH_KEYWORDS}:["${ADJETIVE1}", "${ADJETIVE2}", ...]' -s '${SEARCH_KEYWORDS2}:[...] -b /backups/ -t ${BACKUP_INTERVAL_IN_SECONDS} '
+$ docker run -ti --rm --name o-crawler -v ${LOCAL_BACKUPS_FOLDER}:/backups dkmivan/oculus-crawl ocrawl http://${EXTENRAL_HOST}:${EXTERNAL_PORT} -n ${DATASET_NAME} -s '${SEARCH_KEYWORDS}:["${ADJETIVE1}", "${ADJETIVE2}", ...]' -s '${SEARCH_KEYWORDS2}:[...]' -b /backups/ -t ${BACKUP_INTERVAL_IN_SECONDS} '
 ```
 
 This command will execute the client, which will request the creation of a dataset of name `${DATASET_NAME}` to the factory located at `http://${EXTENRAL_HOST}:${EXTERNAL_PORT}`. The dataset will consist of the search keywords specified at `${SEARCH_KEYWORDS}` (spaces allowed) + combination of adjetives specified at `["${ADJETIVE1}", "${ADJETIVE2}", ...]`. Each `${BACKUP_INTERVAL_IN_SECONDS}` seconds the search session will be saved and dumped inside your local folder `${LOCAL_BACKUPS_FOLDER}`. Note that the search session backup is enough to build the entire dataset again by injecting it to a existing search session of any factory, without the need of any crawler; even though this functionality is not accessible, it exists in the code and will be interfaced in the future.
@@ -76,7 +76,7 @@ docker run -ti -d --rm --name o-crawler dkmivan/oculus-crawl crawler http://172.
 docker run -ti --rm --name o-crawl -v "${BACKUPS_FOLDER}":/backups dkmivan/oculus-crawl ocrawl http://172.17.0.1:24005 -n "cats_dataset_example" -s 'cat:["small", "cute"]' -b /backups/ -t 1
 ```
 
-Track the process on the terminal until it is finished. The dataset will be available at your "${HOME}/datasets" folder.
+Track the process on the terminal until it is finished. The dataset will be available at your `${HOME}/datasets` folder.
 
 ![alt text][terminal result]
 
