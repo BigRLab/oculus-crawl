@@ -23,7 +23,7 @@ It is highly encouraged to install [Docker](https://www.docker.com/) prior testi
 
 ## How to make it work
 
-NOTE: If you want a direct working and easy-to-test example, go to the [examples section](##Examples).
+NOTE: If you want a direct working and easy-to-test example, go to the [examples section](#Examples).
 
 1. On a well-known machine, run the factory as follows:
 
