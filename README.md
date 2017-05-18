@@ -75,18 +75,30 @@ docker run -ti --rm --name o-crawl -v "${BACKUPS_FOLDER}":/backups dkmivan/oculu
 ```
 
 Track the process on the terminal until it is finished. The dataset will be available at your "${HOME}/datasets" folder.
+
+![alt text][terminal result]
+
 [terminal result]: https://github.com/ipazc/oculus-crawl/blob/master/ocrawl-client.jpeg "Oculus Crawl tool client output."
 
 ## Results
 
 When the process finishes, a zipped dataset is released in the folder you specified. For the example of a dataset of cats with only two adjetives (small and cute) and a single crawler, it took ~5 minutes, crawled a total of 2208 pictures with an overall size of ~500 MB zipped:
-[folder result]: https://github.com/ipazc/oculus-crawl/blob/master/ocrawl-result-folder1.jpeg "Oculus Crawl result."
+
+![alt text][folder result1]
+
+[folder result1]: https://github.com/ipazc/oculus-crawl/blob/master/ocrawl-result-folder1.jpeg "Oculus Crawl result."
 
 The content of the zip file is as follows:
-[folder result]: https://github.com/ipazc/oculus-crawl/blob/master/ocrawl-result-folder2.jpeg "Oculus Crawl result zip content."
+
+![alt text][folder result2]
+
+[folder result2]: https://github.com/ipazc/oculus-crawl/blob/master/ocrawl-result-folder2.jpeg "Oculus Crawl result zip content."
 
 An overview of the images:
-[folder result]: https://github.com/ipazc/oculus-crawl/blob/master/ocrawl-result-folder3.jpeg "Oculus Crawl result zip content."
+
+![alt text][folder result3]
+
+[folder result3]: https://github.com/ipazc/oculus-crawl/blob/master/ocrawl-result-folder3.jpeg "Oculus Crawl result zip content."
 
 ## Estructure of the metadata
 
