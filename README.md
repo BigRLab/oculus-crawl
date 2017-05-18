@@ -66,7 +66,7 @@ BACKUPS_FOLDER="${DATASETS_FOLDER}/backups"
 
 mkdir -p "${BACKUPS_FOLDER}"
 
-# 1. Run the factory on background and bind it to the docker local internet host (172.17.0.1:24005).
+# 1. Run the factory on background and bind it to the local net interface from docker (172.17.0.1:24005).
 docker run -ti -d --rm --name o-factory -v "${DATASETS_FOLDER}":/datasets -p 172.17.0.1:24005:24005 dkmivan/oculus-crawl factory 0.0.0.0 -d /datasets/
 
 # 2. Run the crawler on background with one worker
@@ -102,7 +102,7 @@ An overview of the images:
 
 [folder result3]: https://github.com/ipazc/oculus-crawl/blob/master/ocrawl-result-folder3.jpeg "Oculus Crawl result zip content."
 
-## Estructure of the metadata
+## Structure of the metadata
 
 Oculus-crawl generates a single metadata file in JSON format describing each of the elements from the dataset. A sample of this metadata, extracted from the example of the cats dataset is:
 
