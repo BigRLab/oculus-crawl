@@ -55,7 +55,7 @@ This command will execute the client, which will request the creation of a datas
 
 The following example gives the three roles (factory, crawler and client) to a single machine with Docker; however it can be easily finetuned by changing the hosts addresses to run spread in distributed systems. 
 
-As a clarification if you are not familiar with docker, the `docker run` command will download (only the first time) the latest image of Oculus-Crawl from my repository at https://hub.docker.com/r/dkmivan/oculus-crawl/tags/ and run each application containerized. Thus, you don't need to perform any prior set-up on your machine to make this example work, just ensure to have docker installed. You can learn more about docker [here](https://docs.docker.com/get-started/).
+As a clarification if you are not familiar with docker, the `docker run` command will download (only the first time) the latest image of Oculus-Crawl from the dockerhub repository at https://hub.docker.com/r/dkmivan/oculus-crawl/tags/ and run each application containerized. Thus, you don't need to perform any prior set-up on your machine to make this example work, just ensure to have docker installed. You can learn more about docker [here](https://docs.docker.com/get-started/).
 
 ### Create a dataset of cats 
 
