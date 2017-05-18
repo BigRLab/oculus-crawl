@@ -14,7 +14,6 @@ from main.service.status import SERVICE_CRAWLING_DATA, SERVICE_FETCHING_DATA, SE
 __author__ = "Ivan de Paz Centeno"
 
 DEFAULT_DATASET_DIR = "/tmp/"
-PUBLISH_DIR = "/var/www/datasets/"
 DEFAULT_WAIT_TIME_SECONDS = 5  # time before starting to fetch data
 
 
@@ -33,7 +32,7 @@ class DatasetBuilder(Service):
     the process must be finished beforehand.
     """
     def __init__(self, search_session, name, autostart=True, dataset_type=GenericDataset,
-                 default_dataset_dir="/tmp/", publish_dir="/var/www/datasets/", autoclose_search_session_on_exit=False,
+                 default_dataset_dir="/tmp/", publish_dir="/var/www/html/", autoclose_search_session_on_exit=False,
                  on_finished=None):
         Service.__init__(self)
         self.search_session = search_session
@@ -46,6 +45,7 @@ class DatasetBuilder(Service):
         self.autoclose_search_session_on_exit = autoclose_search_session_on_exit
         self.on_finished = on_finished
         self.name = name
+        self.publish_dir = publish_dir
 
         if autostart:
             self.start()
@@ -111,7 +111,7 @@ class DatasetBuilder(Service):
             filename = "{}.zip".format(self.dataset.get_name())
 
             self.__set_status__(SERVICE_PUBLISHING_DATA)
-            move("./{}".format(filename), os.path.join(PUBLISH_DIR, filename))
+            move("./{}".format(filename), os.path.join(self.publish_dir, filename))
 
             rmtree(self.dataset.get_root_folder())
             self.__set_status__(SERVICE_CREATED_DATASET)

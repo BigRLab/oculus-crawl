@@ -1,0 +1,27 @@
+FROM dkmivan/oculus-crawl:base_d8
+
+MAINTAINER IVÁN DE PAZ CENTENO <ipazc@unileon.es, ivan@sockhost.net>
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN echo "version 1.0.0"
+WORKDIR /
+
+RUN apt-get update && apt-get install git -y \
+ && git clone https://github.com/ipazc/oculus-crawl.git \
+ && rm -r oculus-crawl/.git \
+ && apt-get remove git -y \
+ && apt-get autoremove -y \
+ && apt-get clean 
+ 
+RUN echo '#!/bin/bash\n\
+cd /oculus-crawl/\n\
+python3 -m main.bin.factory "$@"' > /bin/factory && chmod +x /bin/factory \
+ && echo '#!/bin/bash\n\ 
+cd /oculus-crawl/\n\
+python3 -m main.bin.crawler "$@"' > /bin/crawler && chmod +x /bin/crawler \
+ && echo '#!/bin/bash\n\ 
+cd /oculus-crawl/\n\
+python3 -m main.bin.ocrawl "$@"' > /bin/ocrawl && chmod +x /bin/ocrawl
+
+RUN rm /core
