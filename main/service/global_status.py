@@ -11,6 +11,7 @@ import multiprocessing
 
 __author__ = 'Iván de Paz Centeno'
 
+
 class GlobalStatus(Service):
     """
     Allows tracking status of each spawned process
@@ -94,14 +95,14 @@ class GlobalStatus(Service):
         :return: None
         """
 
-        lines_handled = 0
+        lines_handled = 1
 
         try:
             while not self.__get_stop_flag__():
                 status_string = str(self)
-                lines_count = len(status_string.split("\n"))
+                lines_count = len(status_string.split("\n")) + 1
 
-                lines_to_add = max(0, lines_count-lines_handled)
+                lines_to_add = max(1, lines_count-lines_handled)
                 lines_handled = lines_count
                 print("\n"*lines_to_add, end="")
 
