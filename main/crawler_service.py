@@ -12,6 +12,9 @@ from main.service.global_status import  global_status
 __author__ = "Ivan de Paz Centeno"
 
 
+QUEUE_BUFFER = 1
+
+
 class CrawlerService(Service, RequestPool):
 
     def __init__(self, search_session, time_secs_between_requests=0.5, processes=1):
@@ -111,7 +114,7 @@ class CrawlerService(Service, RequestPool):
         while not self.__get_stop_flag__():
 
             with self.lock:
-                if self.processing_queue.qsize() < self.processes:
+                if self.processing_queue.qsize() < QUEUE_BUFFER:
 
                     try:
                         search_request = self.search_session.pop_new_search_request()
