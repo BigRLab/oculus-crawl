@@ -4,7 +4,7 @@ MAINTAINER IVÁN DE PAZ CENTENO <ipazc@unileon.es, ivan@sockhost.net>
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN echo "version 1.0.0"
+RUN echo "version 1.0.0.0"
 WORKDIR /
 
 RUN apt-get update && apt-get install git -y \

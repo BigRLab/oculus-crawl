@@ -1,20 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from threading import Lock
 
+from threading import Lock
 from main.service.request_pool import RequestPool
 from main.service.service import Service, SERVICE_STOPPED
 from time import sleep
-
 import logging
-
 from main.service.global_status import  global_status
 
+
 __author__ = "Ivan de Paz Centeno"
-
-
-# Number of elements that the service is going to keep at least in the queue, all the time.
-QUEUE_MIN_BUFFER = 5
 
 
 class CrawlerService(Service, RequestPool):
@@ -116,7 +111,7 @@ class CrawlerService(Service, RequestPool):
         while not self.__get_stop_flag__():
 
             with self.lock:
-                if self.processing_queue.qsize() < QUEUE_MIN_BUFFER:
+                if self.processing_queue.qsize() < self.processes:
 
                     try:
                         search_request = self.search_session.pop_new_search_request()
