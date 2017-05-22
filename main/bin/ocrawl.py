@@ -186,6 +186,8 @@ try:
             print("Adjetives do not have a valid format. Must be JSON-compliant.")
             exit(-1)
 
+    random.shuffle(search_requests)
+
     for search_request in search_requests:
         print ("{}: {}".format(search_request.get_search_engine_proto() ,search_request.get_words()))
 
